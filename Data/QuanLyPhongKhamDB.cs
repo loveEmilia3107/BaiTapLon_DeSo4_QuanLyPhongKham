@@ -28,7 +28,6 @@ public class QuanLyPhongKhamDB : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // 🛑 PRE-CREATE (SEED DATA): TỰ ĐỘNG TẠO TÀI KHOẢN ADMIN MẶC ĐỊNH
         modelBuilder.Entity<TaiKhoan>().HasData(
             new TaiKhoan
             {
