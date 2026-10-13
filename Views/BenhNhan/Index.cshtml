@@ -1,0 +1,205 @@
+@using Microsoft.AspNetCore.Http
+@model IEnumerable<QuanLyPhongKham.Models.BenhNhan>
+
+@{
+    ViewData["Title"] = "Hồ sơ Bệnh nhân";
+
+    int? currentRole = Context.Session.GetInt32("Role");
+    bool isAdmin = currentRole.HasValue && currentRole.Value == 0;
+    bool isShowAll = ViewBag.IsShowAll ?? false;
+}
+
+<!-- HEADER TRANG -->
+<div class="card shadow-sm border-0 mb-4 rounded-3">
+    <div class="card-body p-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div>
+                <h3 class="fw-bold text-primary mb-1">
+                    <i class="bi bi-people-fill me-2"></i>
+                    @(isShowAll ? "Quản Lý Tất Cả Bệnh Nhân (Toàn Hệ Thống)" : "Hồ Sơ Bệnh Nhân Của Tôi")
+                </h3>
+                <p class="text-muted mb-0">
+                    @(isShowAll ? "Danh sách toàn bộ hồ sơ bệnh nhân của phòng khám" : "Danh sách hồ sơ bệnh nhân đã tạo")
+                </p>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <!-- 🛑 NÚT CHUYỂN ĐỔI CHẾ ĐỘ XEM CHỈ DÀNH CHO ADMIN -->
+                @if (isAdmin)
+                {
+                    <div class="btn-group me-2" role="group">
+                        <a asp-action="Index" asp-route-all="false"
+                           class="btn btn-outline-primary fw-semibold @(!isShowAll ? "active" : "")">
+                            <i class="bi bi-person-fill me-1"></i> Của tôi
+                        </a>
+                        <a asp-action="Index" asp-route-all="true"
+                           class="btn btn-outline-primary fw-semibold @(isShowAll ? "active" : "")">
+                            <i class="bi bi-globe me-1"></i> Tất cả
+                        </a>
+                    </div>
+                }
+
+                <a asp-action="Create" class="btn btn-success fw-semibold shadow-sm">
+                    <i class="bi bi-person-plus-fill me-1"></i> Thêm Hồ Sơ Bệnh Nhân
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show my-3 shadow-sm border-0" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i> @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (Model != null && Model.Any())
+{
+    <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-primary text-white">
+                    <tr>
+                        <th class="py-3 px-4">Tên Bệnh nhân</th>
+                        <th class="py-3 px-3">Ngày sinh</th>
+                        <th class="py-3 px-3">Số điện thoại</th>
+                        <th class="py-3 px-3">Email</th>
+                        <th class="py-3 px-3">Địa chỉ</th>
+                        @if (isShowAll)
+                        {
+                            <th class="py-3 px-3">Tài khoản sở hữu</th>
+                        }
+                        <th class="py-3 px-4 text-end" style="min-width: 180px;">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <!-- TÊN BỆNH NHÂN -->
+                            <td class="px-4">
+                                <div class="d-flex align-items-center">
+                                    <div
+                                        class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 me-3 d-none d-sm-block">
+                                        <i class="bi bi-person-vcard fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold text-dark fs-6">@item.tenBN</div>
+                                        <small class="text-muted">Mã BN: #@item.maBN</small>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- NGÀY SINH -->
+                            <td class="px-3">
+                                <span class="fw-semibold text-dark">
+                                    <i class="bi bi-calendar-check me-1 text-secondary"></i>
+                                    @item.nsBN.ToString("dd/MM/yyyy")
+                                </span>
+                            </td>
+
+                            <!-- SỐ ĐIỆN THOẠI -->
+                            <td class="px-3">
+                                <span class="fw-bold text-primary">
+                                    <i class="bi bi-telephone me-1"></i>@item.sdtBN
+                                </span>
+                            </td>
+
+                            <!-- EMAIL -->
+                            <td class="px-3 text-muted">
+                                @(string.IsNullOrEmpty(item.email) ? "—" : item.email)
+                            </td>
+
+                            <!-- ĐỊA CHỈ -->
+                            <td class="px-3 text-dark">
+                                @(string.IsNullOrEmpty(item.diachi) ? "—" : item.diachi)
+                            </td>
+
+                            <!-- TÀI KHOẢN SỞ HỮU (CHỈ HIỆN KHI ADMIN ĐANG BẬT TAB XEM TẤT CẢ) -->
+                            @if (isShowAll)
+                            {
+                                <td class="px-3">
+                                    <span class="badge bg-info text-dark">
+                                        <i class="bi bi-shield-lock me-1"></i>@(item.mTK != null ? item.mTK.username : "N/A")
+                                    </span>
+                                </td>
+                            }
+
+                            <!-- THAO TÁC -->
+                            <td class="px-4 text-end">
+                                <div class="d-inline-flex gap-1 align-items-center">
+                                    <a asp-action="Details" asp-route-id="@item.maBN" class="btn btn-sm btn-outline-info"
+                                       title="Xem chi tiết">
+                                        <i class="bi bi-eye"></i> Chi tiết
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@item.maBN" class="btn btn-sm btn-outline-primary"
+                                       title="Chỉnh sửa">
+                                        <i class="bi bi-pencil"></i> Sửa
+                                    </a>
+                                    <!-- NÚT MỞ MODAL XÓA BỆNH NHÂN -->
+                                    <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal"
+                                            data-bs-target="#deleteModal-@item.maBN" title="Xóa hồ sơ">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+
+                                    <!-- MODAL XÁC NHẬN XÓA TẠI CHỖ -->
+                                    <div class="modal fade" id="deleteModal-@item.maBN" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered text-start">
+                                            <div class="modal-content border-0 shadow">
+                                                <div class="modal-header bg-danger text-white">
+                                                    <h5 class="modal-title fw-bold">
+                                                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Xác Nhận Xóa Hồ Sơ
+                                                    </h5>
+                                                    <button type="button" class="btn-close btn-close-white"
+                                                            data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body p-4">
+                                                    <p class="mb-1 text-dark fs-6">
+                                                        Bạn có chắc chắn muốn xóa hồ sơ bệnh nhân <strong
+                                                        class="text-danger">@item.tenBN</strong> không?
+                                                    </p>
+                                                    <small class="text-muted d-block mt-2">
+                                                        <i class="bi bi-info-circle me-1"></i>Lưu ý: Chỉ có thể xóa khi tất cả
+                                                        các phiếu đăng ký khám của bệnh nhân này đã hoàn tất hoặc đã hủy.
+                                                    </small>
+                                                </div>
+                                                <div class="modal-footer bg-light p-3">
+                                                    <button type="button" class="btn btn-secondary fw-semibold"
+                                                            data-bs-dismiss="modal">Hủy bỏ</button>
+
+                                                    <form asp-action="Delete" asp-route-id="@item.maBN" method="post"
+                                                          class="d-inline">
+                                                        @Html.AntiForgeryToken()
+                                                        <button type="submit" class="btn btn-danger fw-semibold px-4">
+                                                            <i class="bi bi-trash me-1"></i> Đúng, Xóa Ngay!
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+else
+{
+    <div class="card shadow-sm border-0 rounded-3 text-center p-5">
+        <div class="card-body">
+            <i class="bi bi-person-x text-muted display-1 mb-3"></i>
+            <h4 class="fw-bold text-dark mb-2">Chưa có hồ sơ bệnh nhân nào!</h4>
+            <p class="text-muted">
+                @(isShowAll ? "Hệ thống hiện tại chưa có dữ liệu bệnh nhân nào." : "Bạn chưa tạo hồ sơ bệnh nhân nào dưới tài khoản này.")
+            </p>
+            <a asp-action="Create" class="btn btn-primary mt-2 fw-semibold">
+                <i class="bi bi-person-plus-fill me-1"></i> Thêm Hồ Sơ Bệnh Nhân Mới
+            </a>
+        </div>
+    </div>
+}

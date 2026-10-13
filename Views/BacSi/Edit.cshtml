@@ -1,0 +1,82 @@
+@using static QuanLyPhongKham.Models.BacSi
+@model QuanLyPhongKham.Models.BacSi
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>BacSi</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="maBS" />
+            <div class="form-group">
+                <label asp-for="tenBS" class="control-label"></label>
+                <input asp-for="tenBS" class="form-control" />
+                <span asp-validation-for="tenBS" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="mck" class="control-label"></label>
+                <select asp-for="mck" class="form-control" asp-items="ViewBag.mck"></select>
+                <span asp-validation-for="mck" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="nsBS" class="control-label"></label>
+                <input asp-for="nsBS" class="form-control" />
+                <span asp-validation-for="nsBS" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="Gt" /> @Html.DisplayNameFor(model => model.Gt)
+                </label>
+            </div>
+            <div class="form-group">
+                <label asp-for="sdtBS" class="control-label"></label>
+                <input asp-for="sdtBS" class="form-control" />
+                <span asp-validation-for="sdtBS" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="emailBS" class="control-label"></label>
+                <input asp-for="emailBS" class="form-control" />
+                <span asp-validation-for="emailBS" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TrD" class="control-label"></label>
+                <input asp-for="TrD" class="form-control" />
+                <span asp-validation-for="TrD" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="namKN" class="control-label"></label>
+                <input asp-for="namKN" class="form-control" />
+                <span asp-validation-for="namKN" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="giaKham" class="control-label"></label>
+                <input asp-for="giaKham" class="form-control" />
+                <span asp-validation-for="giaKham" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TrangThaiBS" class="control-label"></label>
+                <select asp-for="TrangThaiBS" class="form-control" asp-items="Html.GetEnumSelectList<TrangThaiBacSi>()">
+                </select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,164 @@
+is_global = true
+build_property.TargetFramework = net10.0
+build_property.TargetFramework = net10.0
+build_property.TargetPlatformMinVersion = 
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.TargetFrameworkIdentifier = .NETCoreApp
+build_property.TargetFrameworkVersion = v10.0
+build_property.EntryPointFilePath = 
+build_property.RootNamespace = QuanLyPhongKham
+build_property.RootNamespace = QuanLyPhongKham
+build_property.ProjectDir = C:\Users\Hai Ha\Documents\VScode\BaiTapLon\QuanLyPhongKham\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 10.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = C:\Users\Hai Ha\Documents\VScode\BaiTapLon\QuanLyPhongKham
+build_property._RazorSourceGeneratorDebug = 
+build_property.EffectiveAnalysisLevelStyle = 10.0
+build_property.EnableCodeStyleSeverity = 
+
+[C:/Users/Hai Ha/Documents/VScode/BaiTapLon/QuanLyPhongKham/Views/BacSi/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmFjU2lcQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Hai Ha/Documents/VScode/BaiTapLon/QuanLyPhongKham/Views/BacSi/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmFjU2lcRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Hai Ha/Documents/VScode/BaiTapLon/QuanLyPhongKham/Views/BacSi/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmFjU2lcRWRpdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Hai Ha/Documents/VScode/BaiTapLon/QuanLyPhongKham/Views/BacSi/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmFjU2lcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Hai Ha/Documents/VScode/BaiTapLon/QuanLyPhongKham/Views/BenhNhan/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmVuaE5oYW5cQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Hai Ha/Documents/VScode/BaiTapLon/QuanLyPhongKham/Views/BenhNhan/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmVuaE5oYW5cRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Hai Ha/Documents/VScode/BaiTapLon/QuanLyPhongKham/Views/BenhNhan/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmVuaE5oYW5cRWRpdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Hai Ha/Documents/VScode/BaiTapLon/QuanLyPhongKham/Views/BenhNhan/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmVuaE5oYW5cSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Hai Ha/Documents/VScode/BaiTapLon/QuanLyPhongKham/Views/ChuyenKhoa/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2h1eWVuS2hvYVxDcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Hai Ha/Documents/VScode/BaiTapLon/QuanLyPhongKham/Views/ChuyenKhoa/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2h1eWVuS2hvYVxEZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Hai Ha/Documents/VScode/BaiTapLon/QuanLyPhongKham/Views/ChuyenKhoa/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2h1eWVuS2hvYVxFZGl0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Hai Ha/Documents/VScode/BaiTapLon/QuanLyPhongKham/Views/ChuyenKhoa/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2h1eWVuS2hvYVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Hai Ha/Documents/VScode/BaiTapLon/QuanLyPhongKham/Views/DangKyKham/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGFuZ0t5S2hhbVxDcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Hai Ha/Documents/VScode/BaiTapLon/QuanLyPhongKham/Views/DangKyKham/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGFuZ0t5S2hhbVxEZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Hai Ha/Documents/VScode/BaiTapLon/QuanLyPhongKham/Views/DangKyKham/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGFuZ0t5S2hhbVxFZGl0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Hai Ha/Documents/VScode/BaiTapLon/QuanLyPhongKham/Views/DangKyKham/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGFuZ0t5S2hhbVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Hai Ha/Documents/VScode/BaiTapLon/QuanLyPhongKham/Views/Home/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Hai Ha/Documents/VScode/BaiTapLon/QuanLyPhongKham/Views/LichKham/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGljaEtoYW1cQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Hai Ha/Documents/VScode/BaiTapLon/QuanLyPhongKham/Views/LichKham/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGljaEtoYW1cRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Hai Ha/Documents/VScode/BaiTapLon/QuanLyPhongKham/Views/LichKham/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGljaEtoYW1cRWRpdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Hai Ha/Documents/VScode/BaiTapLon/QuanLyPhongKham/Views/LichKham/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGljaEtoYW1cSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Hai Ha/Documents/VScode/BaiTapLon/QuanLyPhongKham/Views/Shared/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Hai Ha/Documents/VScode/BaiTapLon/QuanLyPhongKham/Views/Shared/_ValidationScriptsPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Hai Ha/Documents/VScode/BaiTapLon/QuanLyPhongKham/Views/TaiKhoan/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGFpS2hvYW5cQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Hai Ha/Documents/VScode/BaiTapLon/QuanLyPhongKham/Views/TaiKhoan/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGFpS2hvYW5cRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Hai Ha/Documents/VScode/BaiTapLon/QuanLyPhongKham/Views/TaiKhoan/DoiMatKhau.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGFpS2hvYW5cRG9pTWF0S2hhdS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Hai Ha/Documents/VScode/BaiTapLon/QuanLyPhongKham/Views/TaiKhoan/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGFpS2hvYW5cRWRpdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Hai Ha/Documents/VScode/BaiTapLon/QuanLyPhongKham/Views/TaiKhoan/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGFpS2hvYW5cSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Hai Ha/Documents/VScode/BaiTapLon/QuanLyPhongKham/Views/TaiKhoan/Login.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGFpS2hvYW5cTG9naW4uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Hai Ha/Documents/VScode/BaiTapLon/QuanLyPhongKham/Views/TaiKhoan/Register.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGFpS2hvYW5cUmVnaXN0ZXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Hai Ha/Documents/VScode/BaiTapLon/QuanLyPhongKham/Views/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Hai Ha/Documents/VScode/BaiTapLon/QuanLyPhongKham/Views/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Hai Ha/Documents/VScode/BaiTapLon/QuanLyPhongKham/Views/Shared/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = b-6ml13i8ryc

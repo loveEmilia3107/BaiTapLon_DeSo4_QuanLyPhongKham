@@ -1,0 +1,108 @@
+@using Microsoft.AspNetCore.Http
+@model QuanLyPhongKham.Models.BenhNhan
+
+@{
+    ViewData["Title"] = "Cập Nhật Hồ Sơ Bệnh Nhân";
+
+    int? currentRole = Context.Session.GetInt32("Role");
+    bool isAdmin = currentRole == 0;
+}
+
+<div class="row justify-content-center my-4">
+    <div class="col-md-8 col-lg-7">
+        <div class="card shadow-sm border-0 rounded-3">
+            <!-- HEADER -->
+            <div class="card-header bg-primary text-white p-3 text-center">
+                <h4 class="mb-0 fw-bold">
+                    <i class="bi bi-pencil-square me-2"></i>Cập Nhật Hồ Sơ Bệnh Nhân #@Model.maBN
+                </h4>
+            </div>
+
+            <!-- FORM BODY -->
+            <div class="card-body p-4">
+                <form asp-action="Edit">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                    <input type="hidden" asp-for="maBN" />
+
+                    <div class="row g-3">
+                        <!-- TÀI KHOẢN SỞ HỮU (CHỈ ADMIN MỚI ĐƯỢC ĐỔI) -->
+                        <div class="col-md-12">
+                            <label asp-for="mtk" class="form-label fw-bold">
+                                Mã tài khoản - Tên tài khoản <span class="text-danger">*</span>
+                            </label>
+                            @if (isAdmin)
+                            {
+                                <select asp-for="mtk" class="form-select border-primary fw-semibold" asp-items="ViewBag.mtk"
+                                        required></select>
+                                <small class="text-muted d-block mt-1">
+                                    <i class="bi bi-info-circle me-1"></i>Chế độ Admin: Có thể chuyển quyền sở hữu hồ sơ
+                                    sang tài khoản khác.
+                                </small>
+                            }
+                            else
+                            {
+                                <select asp-for="mtk" class="form-select bg-light" asp-items="ViewBag.mtk"
+                                        disabled></select>
+                                <input type="hidden" asp-for="mtk" />
+                            }
+                            <span asp-validation-for="mtk" class="text-danger"></span>
+                        </div>
+
+                        <!-- HỌ TÊN -->
+                        <div class="col-md-6">
+                            <label asp-for="tenBN" class="form-label fw-bold">Họ Và Tên <span
+                                class="text-danger">*</span></label>
+                                <input asp-for="tenBN" class="form-control" placeholder="Nhập họ và tên..." required />
+                                <span asp-validation-for="tenBN" class="text-danger"></span>
+                            </div>
+
+                            <!-- NGÀY SINH -->
+                            <div class="col-md-6">
+                                <label asp-for="nsBN" class="form-label fw-bold">Ngày Sinh</label>
+                                <input asp-for="nsBN" class="form-control" type="date" />
+                                <span asp-validation-for="nsBN" class="text-danger"></span>
+                            </div>
+
+                            <!-- SỐ ĐIỆN THOẠI -->
+                            <div class="col-md-6">
+                                <label asp-for="sdtBN" class="form-label fw-bold">Số Điện Thoại</label>
+                                <input asp-for="sdtBN" class="form-control" placeholder="Nhập SĐT liên hệ..." />
+                                <span asp-validation-for="sdtBN" class="text-danger"></span>
+                            </div>
+
+                            <!-- EMAIL -->
+                            <div class="col-md-6">
+                                <label asp-for="email" class="form-label fw-bold">Địa Chỉ Email</label>
+                                <input asp-for="email" class="form-control" type="email" placeholder="example@email.com" />
+                                <span asp-validation-for="email" class="text-danger"></span>
+                            </div>
+
+                            <!-- ĐỊA CHỈ -->
+                            <div class="col-12">
+                                <label asp-for="diachi" class="form-label fw-bold">Địa Chỉ Thường Trú</label>
+                                <textarea asp-for="diachi" class="form-control" rows="2"
+                                          placeholder="Nhập địa chỉ nhà..."></textarea>
+                                <span asp-validation-for="diachi" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- BUTTONS -->
+                        <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+                            <a asp-action="Index" class="btn btn-outline-secondary fw-semibold">
+                                <i class="bi bi-arrow-left me-1"></i> Quay lại
+                            </a>
+                            <button type="submit" class="btn btn-primary fw-semibold px-4 shadow-sm">
+                                <i class="bi bi-check-circle me-1"></i> Lưu Cập Nhật
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @section Scripts {
+        @{
+            await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        }
+    }

@@ -1,0 +1,409 @@
+@using Microsoft.AspNetCore.Http
+@model IEnumerable<QuanLyPhongKham.Models.BacSi>
+
+@{
+    ViewData["Title"] = "Danh sách Bác sĩ";
+    bool isFiltering = ViewBag.IsFiltering ?? false;
+    bool hasData = Model != null && Model.Any();
+
+    // 🛑 KIỂM TRA ROLE ADMIN (Role == 0 là Admin)
+    int? currentRole = Context.Session.GetInt32("Role");
+    bool isAdmin = currentRole.HasValue && currentRole.Value == 0;
+}
+
+<!-- HEADER TRANG -->
+<div class="card shadow-sm border-0 mb-4 rounded-3">
+    <div class="card-body p-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div>
+                <h3 class="fw-bold text-primary mb-1">
+                    <i class="bi bi-person-badge-fill me-2"></i>Đội Ngũ Bác Sĩ
+                </h3>
+                <p class="text-muted mb-0">Quản lý danh sách, chuyên khoa và lịch trình làm việc của bác sĩ</p>
+            </div>
+            <div class="d-flex gap-2">
+                @if (hasData || isFiltering)
+                {
+                    <button class="btn btn-outline-primary fw-semibold" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#filterCollapse" aria-expanded="@(isFiltering ? "true" : "false")"
+                            aria-controls="filterCollapse">
+                        <i class="bi bi-funnel-fill me-1"></i> Tìm kiếm & Lọc
+                        @if (isFiltering)
+                        {
+                            <span class="badge bg-danger ms-1">Đang bật</span>
+                        }
+                    </button>
+                }
+
+                @if (isAdmin)
+                {
+                    <a asp-action="Create" class="btn btn-success fw-semibold">
+                        <i class="bi bi-plus-lg me-1"></i> Thêm Bác sĩ Mới
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show my-3 shadow-sm border-0" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i> @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show my-3 shadow-sm border-0" role="alert">
+        <i class="bi bi-check-circle-fill me-2 fs-5"></i> @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<!-- KHU VỰC BỘ LỌC TÌM KIẾM -->
+@if (hasData || isFiltering)
+{
+    <div class="collapse @(isFiltering ? "show" : "") mb-4" id="filterCollapse">
+        <form method="get" asp-action="Index" id="searchForm" class="card card-body bg-light shadow-sm border-0 rounded-3">
+            <div class="row g-3">
+                <!-- 1. CHỌN TIÊU CHÍ TÌM KIẾM -->
+                <div class="col-12">
+                    <label class="form-label fw-bold text-dark d-block">Lọc tìm kiếm theo:</label>
+                    <div class="d-flex flex-wrap gap-3 align-items-center bg-white p-3 rounded border">
+                        <div class="form-check me-2">
+                            <input class="form-check-input search-type-radio" type="radio" name="SearchType" id="type_none"
+                                   value="" @(string.IsNullOrEmpty((string)ViewBag.SearchType) ? "checked" : null)>
+                            <label class="form-check-label fw-semibold" for="type_none">Tất cả (Không lọc)</label>
+                        </div>
+                        <div class="form-check me-2">
+                            <input class="form-check-input search-type-radio" type="radio" name="SearchType" id="type_ten"
+                                   value="ten" @(ViewBag.SearchType == "ten" ? "checked" : null)>
+                            <label class="form-check-label" for="type_ten">Tên bác sĩ</label>
+                        </div>
+                        <div class="form-check me-2">
+                            <input class="form-check-input search-type-radio" type="radio" name="SearchType" id="type_ck"
+                                   value="ck" @(ViewBag.SearchType == "ck" ? "checked" : null)>
+                            <label class="form-check-label" for="type_ck">Chuyên khoa</label>
+                        </div>
+                        <div class="form-check me-2">
+                            <input class="form-check-input search-type-radio" type="radio" name="SearchType" id="type_kn"
+                                   value="kn" @(ViewBag.SearchType == "kn" ? "checked" : null)>
+                            <label class="form-check-label" for="type_kn">Kinh nghiệm</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input search-type-radio" type="radio" name="SearchType" id="type_gia"
+                                   value="gia" @(ViewBag.SearchType == "gia" ? "checked" : null)>
+                            <label class="form-check-label" for="type_gia">Giá khám</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. KHU VỰC Ô NHẬP DỮ LIỆU -->
+                <div class="col-md-7">
+                    <div id="box_ten" class="search-box-item d-none">
+                        <label class="form-label fw-bold">Nhập tên bác sĩ:</label>
+                        <input type="text" name="SearchTen" value="@ViewBag.SearchTen" class="form-control"
+                               placeholder="Ví dụ: Nguyễn Văn A..." />
+                    </div>
+
+                    <div id="box_ck" class="search-box-item d-none">
+                        <label class="form-label fw-bold">Chọn Chuyên khoa:</label>
+                        <select name="MaCK" class="form-select">
+                            <option value="">-- Tất cả chuyên khoa --</option>
+                            @if (ViewBag.DanhSachChuyenKhoa != null)
+                            {
+                                foreach (var ck in (List<QuanLyPhongKham.Models.ChuyenKhoa>)ViewBag.DanhSachChuyenKhoa)
+                                {
+                                    <option value="@ck.maCK" selected="@(ViewBag.MaCK == ck.maCK ? "selected" : null)">
+                                        @ck.tenCK
+                                    </option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div id="box_kn" class="search-box-item d-none">
+                        <label class="form-label fw-bold">Số năm kinh nghiệm tối thiểu:</label>
+                        <input type="number" name="MinKinhNghiem" value="@ViewBag.MinKinhNghiem" class="form-control"
+                               placeholder="Nhập số năm (VD: 5)..." min="0" />
+                    </div>
+
+                    <div id="box_gia" class="search-box-item d-none">
+                        <label class="form-label fw-bold">Giá khám tối đa (VNĐ):</label>
+                        <input type="number" name="MaxGiaKham" value="@ViewBag.MaxGiaKham" class="form-control"
+                               placeholder="Nhập số tiền (VD: 300000)..." />
+                    </div>
+
+                    <div id="box_none" class="search-box-item text-muted fst-italic pt-2">
+                        <i class="bi bi-info-circle me-1"></i> Đang hiển thị toàn bộ danh sách bác sĩ. Chọn một tiêu chí
+                        phía trên nếu muốn lọc.
+                    </div>
+                </div>
+
+                <!-- 3. PHẦN SẮP XẾP -->
+                <div class="col-md-5">
+                    <label class="form-label fw-bold">Sắp xếp theo:</label>
+                    <select name="SortBy" class="form-select">
+                        <option value="ten_asc" selected="@(ViewBag.SortBy == "ten_asc" ? "selected" : null)">Tên (A - Z)
+                        </option>
+                        <option value="ten_desc" selected="@(ViewBag.SortBy == "ten_desc" ? "selected" : null)">Tên (Z - A)
+                        </option>
+                        <option value="kinhnghiem_desc"
+                                selected="@(ViewBag.SortBy == "kinhnghiem_desc" ? "selected" : null)">Kinh nghiệm nhiều nhất
+                        </option>
+                        <option value="giakham_asc" selected="@(ViewBag.SortBy == "giakham_asc" ? "selected" : null)">Giá
+                            khám tăng dần</option>
+                            <option value="giakham_desc" selected="@(ViewBag.SortBy == "giakham_desc" ? "selected" : null)">Giá
+                                khám giảm dần</option>
+                            </select>
+                        </div>
+
+                        <!-- NÚT BẤM TÌM KIẾM -->
+                        <div class="col-12 text-end mt-3">
+                            <a asp-action="Index" class="btn btn-outline-secondary me-2 fw-semibold">
+                                <i class="bi bi-arrow-counterclockwise me-1"></i> Đặt lại
+                            </a>
+                            <button type="submit" class="btn btn-primary fw-semibold px-4">
+                                <i class="bi bi-search me-1"></i> Tìm kiếm & Lọc
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        }
+
+        <!-- BẢNG DANH SÁCH BÁC SĨ -->
+        @if (hasData)
+        {
+            <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-primary text-white">
+                            <tr>
+                                <th class="py-3 px-4">Bác sĩ</th>
+                                <th class="py-3 px-3">Chuyên khoa</th>
+                                <th class="py-3 px-3">Trình độ</th>
+                                <th class="py-3 px-3 text-center">Kinh nghiệm</th>
+                                <th class="py-3 px-3">Giá khám</th>
+                                <th class="py-3 px-3 text-center">Trạng thái</th>
+                                <th class="py-3 px-4 text-end" style="min-width: 250px;">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model!)
+                            {
+                                bool isRetired = item.TrangThaiBS == QuanLyPhongKham.Models.BacSi.TrangThaiBacSi.DaNghiLam;
+
+                                <tr>
+                                    <!-- TÊN BÁC SĨ & AVATAR -->
+                                    <td class="px-4">
+                                        <div class="d-flex align-items-center">
+                                            <div
+                                                class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 me-3 d-none d-sm-block">
+                                                <i class="bi bi-person-circle fs-4"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold text-dark fs-6">@item.tenBS</div>
+                                                <small class="text-muted">Mã BS: #@item.maBS</small>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <!-- CHUYÊN KHOA -->
+                                    <td class="px-3">
+                                        <span
+                                            class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 px-2 py-1">
+                                            <i class="bi bi-diagram-3 me-1"></i>@(item.mCK != null ? item.mCK.tenCK : "N/A")
+                                        </span>
+                                    </td>
+
+                                    <!-- TRÌNH ĐỘ -->
+                                    <td class="px-3 fw-semibold text-dark">
+                                        @item.TrD
+                                    </td>
+
+                                    <!-- KINH NGHIỆM -->
+                                    <td class="px-3 text-center">
+                                        <span class="fw-bold text-primary">@item.namKN</span> <small class="text-muted">năm</small>
+                                    </td>
+
+                                    <!-- GIÁ KHÁM -->
+                                    <td class="px-3">
+                                        <span class="fw-bold text-success">@item.giaKham.ToString("N0") VNĐ</span>
+                                    </td>
+
+                                    <!-- TRẠNG THÁI -->
+                                    <td class="px-3 text-center">
+                                        @switch (item.TrangThaiBS)
+                                        {
+                                            case QuanLyPhongKham.Models.BacSi.TrangThaiBacSi.DangLamViec:
+                                                <span class="badge bg-success rounded-pill px-3 py-2">
+                                                    <i class="bi bi-check-circle me-1"></i>Đang làm việc
+                                                </span>
+                                                break;
+                                            case QuanLyPhongKham.Models.BacSi.TrangThaiBacSi.TamNghi:
+                                                <span class="badge bg-warning text-dark rounded-pill px-3 py-2">
+                                                    <i class="bi bi-pause-circle me-1"></i>Tạm nghỉ
+                                                </span>
+                                                break;
+                                            case QuanLyPhongKham.Models.BacSi.TrangThaiBacSi.DaNghiLam:
+                                                <span class="badge bg-danger rounded-pill px-3 py-2">
+                                                    <i class="bi bi-x-circle me-1"></i>Đã nghỉ làm
+                                                </span>
+                                                break;
+                                        }
+                                    </td>
+
+                                    <!-- THAO TÁC -->
+                                    <td class="px-4 text-end">
+                                        <div class="d-inline-flex gap-1 align-items-center">
+                                            <!-- 🛑 BÁC SĨ ĐÃ NGHỈ LÀM -> DISABLE NÚT LỊCH KHÁM -->
+                                            @if (isRetired)
+                                            {
+                                                <button class="btn btn-sm btn-outline-secondary fw-semibold" disabled
+                                                        title="Bác sĩ đã nghỉ làm, không thể xem lịch khám">
+                                                    <i class="bi bi-calendar-x me-1"></i> Ngừng nhận
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <a asp-controller="LichKham" asp-action="Index" asp-route-maBS="@item.maBS"
+                                                   class="btn btn-sm btn-outline-success fw-semibold shadow-sm"
+                                                   title="Xem lịch khám của bác sĩ này">
+                                                    <i class="bi bi-calendar3 me-1"></i> Lịch khám
+                                                </a>
+                                            }
+
+                                            <a asp-action="Details" asp-route-id="@item.maBS" class="btn btn-sm btn-outline-info"
+                                               title="Xem chi tiết">
+                                                <i class="bi bi-info-circle"></i>
+                                            </a>
+
+                                            @if (isAdmin)
+                                            {
+                                                <a asp-action="Edit" asp-route-id="@item.maBS" class="btn btn-sm btn-outline-primary"
+                                                   title="Chỉnh sửa bác sĩ">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+
+                                                <!-- 🛑 NÚT MỞ MODAL XÓA BÁC SĨ -->
+                                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal"
+                                                        data-bs-target="#deleteModal-@item.maBS" title="Xóa bác sĩ">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+
+                                                <!-- 🛑 MODAL XÁC NHẬN XÓA TẠI CHỖ -->
+                                                <div class="modal fade" id="deleteModal-@item.maBS" tabindex="-1" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered text-start">
+                                                        <div class="modal-content border-0 shadow">
+                                                            <div class="modal-header bg-danger text-white">
+                                                                <h5 class="modal-title fw-bold">
+                                                                    <i class="bi bi-exclamation-triangle-fill me-2"></i>Xác Nhận Xóa Bác Sĩ
+                                                                </h5>
+                                                                <button type="button" class="btn-close btn-close-white"
+                                                                        data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body p-4">
+                                                                <p class="mb-1 text-dark fs-6">
+                                                                    Bạn có chắc chắn muốn xóa bác sĩ <strong
+                                                                    class="text-danger">@item.tenBS</strong> không?
+                                                                </p>
+                                                                <small class="text-muted d-block mt-2">
+                                                                    <i class="bi bi-info-circle me-1"></i>Lưu ý: Hành động này sẽ xóa toàn
+                                                                    bộ các ca Lịch khám thuộc về bác sĩ này trên hệ thống. Lưu ý: Chỉ có thể
+                                                                    xóa khi tất cả các ca đăng ký khám của bác sĩ này đã hoàn tất hoặc đã
+                                                                    hủy.
+                                                                </small>
+                                                            </div>
+                                                            <div class="modal-footer bg-light p-3">
+                                                                <button type="button" class="btn btn-secondary fw-semibold"
+                                                                        data-bs-dismiss="modal">Hủy bỏ</button>
+
+                                                                <form asp-action="Delete" asp-route-id="@item.maBS" method="post"
+                                                                      class="d-inline">
+                                                                    @Html.AntiForgeryToken()
+                                                                    <button type="submit" class="btn btn-danger fw-semibold px-4">
+                                                                        <i class="bi bi-trash me-1"></i> Đúng, Xóa Ngay!
+                                                                    </button>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="card shadow-sm border-0 rounded-3 text-center p-5">
+                <div class="card-body">
+                    @if (isFiltering)
+                    {
+                        <i class="bi bi-search text-muted display-1 mb-3"></i>
+                        <h4 class="fw-bold text-dark mb-2">Không tìm thấy bác sĩ phù hợp!</h4>
+                        <p class="text-muted">Không có kết quả nào khớp với điều kiện tìm kiếm của bạn.</p>
+                        <a asp-action="Index" class="btn btn-outline-secondary mt-2 fw-semibold">
+                            <i class="bi bi-arrow-counterclockwise me-1"></i> Đặt lại bộ lọc
+                        </a>
+                    }
+                    else
+                    {
+                        <i class="bi bi-person-x text-muted display-1 mb-3"></i>
+                        <h4 class="fw-bold text-dark mb-2">Danh sách bác sĩ hiện đang rỗng!</h4>
+                        <p class="text-muted">Chưa có dữ liệu bác sĩ nào trong hệ thống.</p>
+                        @if (isAdmin)
+                        {
+                            <a asp-action="Create" class="btn btn-primary mt-2 fw-semibold">
+                                <i class="bi bi-plus-lg me-1"></i> Tạo dữ liệu bác sĩ mới
+                            </a>
+                        }
+                    }
+                </div>
+            </div>
+        }
+
+        @section Scripts {
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    const radios = document.querySelectorAll(".search-type-radio");
+                    const boxes = document.querySelectorAll(".search-box-item");
+
+                    function applyFilterState() {
+                        const checkedRadio = document.querySelector(".search-type-radio:checked");
+                        const selectedVal = checkedRadio ? checkedRadio.value : "";
+
+                        boxes.forEach(box => {
+                            const isTarget = box.id === "box_" + (selectedVal || "none");
+                            const inputs = box.querySelectorAll("input, select");
+
+                            if (isTarget) {
+                                box.classList.remove("d-none");
+                                inputs.forEach(i => i.disabled = false);
+                            } else {
+                                box.classList.add("d-none");
+                                inputs.forEach(i => {
+                                    i.disabled = true;
+                                    if (i.tagName === "SELECT") i.selectedIndex = 0;
+                                    else i.value = "";
+                                });
+                            }
+                        });
+                    }
+
+                    radios.forEach(radio => {
+                        radio.addEventListener("change", applyFilterState);
+                    });
+
+                    applyFilterState();
+                });
+            </script>
+        }

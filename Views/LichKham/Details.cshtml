@@ -1,0 +1,119 @@
+@using Microsoft.AspNetCore.Http
+@model QuanLyPhongKham.Models.LichKham
+
+@{
+    ViewData["Title"] = "Chi tiết Lịch khám";
+
+    // 🛑 PHÂN QUYỀN ROLE (0 = Admin, 1 = Bệnh nhân)
+    int? currentRole = Context.Session.GetInt32("Role");
+    bool isAdmin = currentRole.HasValue && currentRole.Value == 0;
+    bool isFull = Model.currentSL >= Model.maxSL;
+    double percent = Model.maxSL > 0 ? ((double)Model.currentSL / Model.maxSL) * 100 : 100;
+}
+
+<div class="row justify-content-center my-4">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0 rounded-3">
+            <!-- HEADER -->
+            <div class="card-header bg-primary text-white p-3 d-flex justify-content-between align-items-center">
+                <h4 class="mb-0 fw-bold">
+                    <i class="bi bi-calendar-event me-2"></i>Chi Tiết Lịch Khám #@Model.maLK
+                </h4>
+                @if (isFull)
+                {
+                    <span class="badge bg-danger rounded-pill px-3 py-2 fs-6">
+                        <i class="bi bi-x-circle me-1"></i>Hết chỗ
+                    </span>
+                }
+                else
+                {
+                    <span class="badge bg-success rounded-pill px-3 py-2 fs-6">
+                        <i class="bi bi-check-circle me-1"></i>Còn chỗ
+                    </span>
+                }
+            </div>
+
+            <!-- CARD BODY -->
+            <div class="card-body p-4">
+                <div class="row g-4">
+                    <!-- BÁC SĨ PHỤ TRÁCH -->
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded-3 border">
+                            <small class="text-muted fw-bold d-block mb-1">BÁC SĨ PHỤ TRÁCH</small>
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-person-badge fs-2 text-primary me-3"></i>
+                                <div>
+                                    <h5 class="fw-bold mb-0 text-dark">
+                                        @(Model.bs != null ? "BS. " + Model.bs.tenBS : "Chưa phân công")
+                                    </h5>
+                                    <small class="text-muted">Trình độ: @(Model.bs != null ? Model.bs.TrD :
+                                                 "N/A")</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- THỜI GIAN KHÁM -->
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded-3 border">
+                                <small class="text-muted fw-bold d-block mb-1">LỊCH KHÁM và CA CỦA BÁC SĨ</small>
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-clock-history fs-2 text-primary me-3"></i>
+                                    <div>
+                                        <h5 class="fw-bold mb-0 text-dark">
+                                            @Model.ngayKham.ToString("dd/MM/yyyy")
+                                        </h5>
+                                        <small class="text-primary fw-bold">
+                                            @Model.gioBatdau.ToString(@"HH\:mm") - @Model.gioKetthuc.ToString(@"HH\:mm")
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SỐ LƯỢNG ĐĂNG KÝ (PROGRESS BAR) -->
+                        <div class="col-12">
+                            <div class="p-3 bg-light rounded-3 border">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="fw-bold text-dark">TÌNH TRẠNG CHỖ ĐĂNG KÝ:</span>
+                                    <span class="fw-bold fs-5 @(isFull ? "text-danger" : "text-primary")">
+                                        @Model.currentSL / @Model.maxSL chỗ
+                                    </span>
+                                </div>
+                                <div class="progress" style="height: 10px;">
+                                    <div class="progress-bar @(isFull ? "bg-danger" : (percent >= 80 ? "bg-warning" : "bg-success"))"
+                                         role="progressbar" style="width: @percent%" aria-valuenow="@Model.currentSL"
+                                         aria-valuemin="0" aria-valuemax="@Model.maxSL">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FOOTER - NÚT THAO TÁC -->
+                <div class="card-footer bg-white p-3 d-flex justify-content-between align-items-center">
+                    <a asp-action="Index" class="btn btn-outline-secondary fw-semibold">
+                        <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách
+                    </a>
+
+                    <div class="d-flex gap-2">
+                        @if (!isFull)
+                        {
+                            <a asp-controller="DangKyKham" asp-action="Create" asp-route-maLK="@Model.maLK"
+                               class="btn btn-success fw-semibold">
+                                <i class="bi bi-calendar-plus me-1"></i> Đăng ký ca khám này
+                            </a>
+                        }
+
+                        @if (isAdmin)
+                        {
+                            <a asp-action="Edit" asp-route-id="@Model.maLK" class="btn btn-primary fw-semibold">
+                                <i class="bi bi-pencil me-1"></i> Chỉnh sửa
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>

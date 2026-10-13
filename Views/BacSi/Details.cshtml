@@ -1,0 +1,183 @@
+@using Microsoft.AspNetCore.Http
+@using static QuanLyPhongKham.Models.BacSi
+@using static QuanLyPhongKham.Models.ChuyenKhoa
+@model QuanLyPhongKham.Models.BacSi
+
+@{
+    ViewData["Title"] = "Chi Tiết Bác Sĩ";
+
+    int? currentRole = Context.Session.GetInt32("Role");
+    bool isAdmin = currentRole.HasValue && currentRole.Value == 0;
+
+    bool isRetired = Model.TrangThaiBS == TrangThaiBacSi.DaNghiLam;
+    bool isTempOff = Model.TrangThaiBS == TrangThaiBacSi.TamNghi;
+    bool isCKDisabled = Model.mCK != null && Model.mCK.TrangThaiCK != TrangThaiChuyenKhoa.DangHoatDong;
+}
+
+<div class="row justify-content-center my-4">
+    <div class="col-md-8 col-lg-7">
+        <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
+            <!-- HEADER CARD -->
+            <div class="card-header bg-primary text-white p-3 text-center">
+                <h4 class="mb-0 fw-bold">
+                    <i class="bi bi-person-badge-fill me-2"></i>Thông Tin Bác Sĩ #@Model.maBS
+                </h4>
+            </div>
+
+            <!-- CARD BODY -->
+            <div class="card-body p-4">
+                <div class="row g-3">
+                    <!-- HỌ VÀ TÊN -->
+                    <div class="col-md-6 border-bottom pb-3">
+                        <label class="text-muted small fw-bold d-block text-uppercase">Họ và Tên</label>
+                        <span class="fs-5 fw-bold text-dark">
+                            <i class="bi bi-person-circle text-primary me-1"></i>BS. @Model.tenBS
+                        </span>
+                    </div>
+
+                    <!-- CHUYÊN KHOA -->
+                    <div class="col-md-6 border-bottom pb-3">
+                        <label class="text-muted small fw-bold d-block text-uppercase">Chuyên Khoa</label>
+                        <span class="badge bg-info-subtle text-info border border-info px-3 py-2 fs-6">
+                            <i class="bi bi-diagram-3 me-1"></i>@(Model.mCK != null ? Model.mCK.tenCK : "Chưa phân khoa")
+                        </span>
+                    </div>
+
+                    <!-- NGÀY SINH -->
+                    <div class="col-md-6 border-bottom pb-3">
+                        <label class="text-muted small fw-bold d-block text-uppercase">Ngày Sinh</label>
+                        <span class="fs-6 fw-semibold text-dark">
+                            <i class="bi bi-calendar-event me-1 text-secondary"></i>
+                            @(Model.nsBS != default(DateTime) ? Model.nsBS.ToString("dd/MM/yyyy") : "Chưa cập nhật")
+                        </span>
+                    </div>
+
+                    <!-- GIỚI TÍNH -->
+                    <div class="col-md-6 border-bottom pb-3">
+                        <label class="text-muted small fw-bold d-block text-uppercase">Giới Tính</label>
+                        <span class="fs-6 fw-semibold text-dark">
+                            <i class="bi bi-gender-ambiguous me-1 text-secondary"></i>
+                            @(Model.Gt ? "Nam" : "Nữ")
+                        </span>
+                    </div>
+
+                    <!-- SỐ ĐIỆN THOẠI -->
+                    <div class="col-md-6 border-bottom pb-3">
+                        <label class="text-muted small fw-bold d-block text-uppercase">Số Điện Thoại</label>
+                        <span class="fs-6 fw-semibold text-dark">
+                            <i class="bi bi-telephone me-1 text-success"></i>
+                            @(string.IsNullOrEmpty(Model.sdtBS) ? "Chưa cập nhật" : Model.sdtBS)
+                        </span>
+                    </div>
+
+                    <!-- EMAIL -->
+                    <div class="col-md-6 border-bottom pb-3">
+                        <label class="text-muted small fw-bold d-block text-uppercase">Địa Chỉ Email</label>
+                        <span class="fs-6 fw-semibold text-dark">
+                            <i class="bi bi-envelope me-1 text-info"></i>
+                            @(string.IsNullOrEmpty(Model.emailBS) ? "Chưa cập nhật" : Model.emailBS)
+                        </span>
+                    </div>
+
+                    <!-- TRÌNH ĐỘ -->
+                    <div class="col-md-6 border-bottom pb-3">
+                        <label class="text-muted small fw-bold d-block text-uppercase">Trình Độ Học Vấn</label>
+                        <span class="fs-6 fw-bold text-dark">
+                            <i class="bi bi-award me-1 text-warning"></i>
+                            @(string.IsNullOrEmpty(Model.TrD) ? "Chưa cập nhật" : Model.TrD)
+                        </span>
+                    </div>
+
+                    <!-- KINH NGHIỆM -->
+                    <div class="col-md-6 border-bottom pb-3">
+                        <label class="text-muted small fw-bold d-block text-uppercase">Kinh Nghiệm</label>
+                        <span class="fs-6 fw-bold text-primary">
+                            <i class="bi bi-briefcase me-1"></i>@Model.namKN năm công tác
+                        </span>
+                    </div>
+
+                    <!-- GIÁ KHÁM -->
+                    <div class="col-md-6 border-bottom pb-3">
+                        <label class="text-muted small fw-bold d-block text-uppercase">Chi Phí Khám Tham Khảo</label>
+                        <span class="fs-5 fw-bold text-success">
+                            <i class="bi bi-cash-stack me-1"></i>@Model.giaKham.ToString("N0") VNĐ
+                        </span>
+                    </div>
+
+                    <!-- TRẠNG THÁI BÁC SĨ -->
+                    <div class="col-md-6 border-bottom pb-3">
+                        <label class="text-muted small fw-bold d-block text-uppercase mb-1">Trạng Thái Công Tác</label>
+                        @switch (Model.TrangThaiBS)
+                        {
+                            case TrangThaiBacSi.DangLamViec:
+                                if (isCKDisabled)
+                                {
+                                    <span class="badge bg-secondary rounded-pill px-3 py-2 fs-6">
+                                        <i class="bi bi-pause-circle me-1"></i>Khoa tạm dừng
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success rounded-pill px-3 py-2 fs-6">
+                                        <i class="bi bi-check-circle me-1"></i>Đang làm việc
+                                    </span>
+                                }
+                                break;
+                            case TrangThaiBacSi.TamNghi:
+                                <span class="badge bg-warning text-dark rounded-pill px-3 py-2 fs-6">
+                                    <i class="bi bi-pause-circle me-1"></i>Tạm nghỉ
+                                </span>
+                                break;
+                            case TrangThaiBacSi.DaNghiLam:
+                                <span class="badge bg-danger rounded-pill px-3 py-2 fs-6">
+                                    <i class="bi bi-x-circle me-1"></i>Đã nghỉ làm
+                                </span>
+                                break;
+                        }
+                    </div>
+                </div>
+
+                <!-- FOOTER BUTTONS THAO TÁC -->
+                <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+                    <a asp-action="Index" class="btn btn-outline-secondary fw-semibold">
+                        <i class="bi bi-arrow-left me-1"></i> Quay lại
+                    </a>
+
+                    <div class="d-flex gap-2">
+                        <!-- 🛑 NÚT LỊCH KHÁM CÓ BẪY BẢO VỆ CHUẨN ĐÉT TỪ INDEX -->
+                        @if (isRetired)
+                        {
+                            <button class="btn btn-outline-secondary fw-semibold" disabled
+                                    title="Bác sĩ đã nghỉ làm, không thể đặt lịch">
+                                <i class="bi bi-calendar-x me-1"></i> Đã nghỉ làm
+                            </button>
+                        }
+                        else if (isCKDisabled)
+                        {
+                            <button class="btn btn-outline-secondary fw-semibold" disabled
+                                    title="Chuyên khoa thuộc bác sĩ này đang tạm dừng hoạt động">
+                                <i class="bi bi-slash-circle me-1"></i> Khoa tạm đóng
+                            </button>
+                        }
+                        else
+                        {
+                            <a asp-controller="LichKham" asp-action="Index" asp-route-maBS="@Model.maBS"
+                               class="btn btn-success fw-semibold shadow-sm"
+                               title="@(isTempOff ? "Bác sĩ đang tạm nghỉ nhưng khoa vẫn nhận đăng ký lịch trước" : "Xem lịch khám của bác sĩ này")">
+                                <i class="bi bi-calendar3 me-1"></i> Xem Lịch Khám
+                            </a>
+                        }
+
+                        @if (isAdmin)
+                        {
+                            <a asp-action="Edit" asp-route-id="@Model.maBS"
+                               class="btn btn-primary fw-semibold px-3 shadow-sm">
+                                <i class="bi bi-pencil me-1"></i> Chỉnh Sửa
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

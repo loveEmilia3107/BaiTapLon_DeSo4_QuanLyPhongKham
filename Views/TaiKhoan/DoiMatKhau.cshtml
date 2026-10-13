@@ -1,0 +1,62 @@
+@model QuanLyPhongKham.Models.DoiMatKhauViewModel
+
+@{
+    ViewData["Title"] = "Đổi Mật Khẩu";
+}
+
+<div class="row justify-content-center my-4">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm border-0 rounded-3">
+            <div class="card-header bg-primary text-white p-3 text-center">
+                <h4 class="mb-0 fw-bold">
+                    <i class="bi bi-key-fill me-2"></i>Đổi Mật Khẩu Cá Nhân
+                </h4>
+            </div>
+
+            <div class="card-body p-4">
+                <form asp-action="DoiMatKhau" method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                    <!-- MẬT KHẨU CŨ -->
+                    <div class="mb-3">
+                        <label asp-for="MatKhauCu" class="form-label fw-bold"></label>
+                        <input asp-for="MatKhauCu" class="form-control" placeholder="Nhập mật khẩu hiện tại..."
+                               required />
+                        <span asp-validation-for="MatKhauCu" class="text-danger"></span>
+                    </div>
+
+                    <!-- MẬT KHẨU MỚI -->
+                    <div class="mb-3">
+                        <label asp-for="MatKhauMoi" class="form-label fw-bold"></label>
+                        <input asp-for="MatKhauMoi" class="form-control" placeholder="Nhập mật khẩu mới..." required />
+                        <span asp-validation-for="MatKhauMoi" class="text-danger"></span>
+                    </div>
+
+                    <!-- XÁC NHẬN MẬT KHẨU MỚI -->
+                    <div class="mb-4">
+                        <label asp-for="XacNhanMatKhauMoi" class="form-label fw-bold"></label>
+                        <input asp-for="XacNhanMatKhauMoi" class="form-control"
+                               placeholder="Xác nhận lại mật khẩu mới..." required />
+                        <span asp-validation-for="XacNhanMatKhauMoi" class="text-danger"></span>
+                    </div>
+
+                    <!-- BUTTONS -->
+                    <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                        <a asp-action="Index" class="btn btn-outline-secondary fw-semibold">
+                            <i class="bi bi-arrow-left me-1"></i> Quay lại
+                        </a>
+                        <button type="submit" class="btn btn-success fw-bold px-4 shadow-sm">
+                            <i class="bi bi-check-circle me-1"></i> Đổi Mật Khẩu
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

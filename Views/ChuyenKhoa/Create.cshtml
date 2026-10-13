@@ -1,0 +1,61 @@
+@using static QuanLyPhongKham.Models.ChuyenKhoa
+@model QuanLyPhongKham.Models.ChuyenKhoa
+
+@{
+    ViewData["Title"] = "Thêm Chuyên Khoa Mới";
+}
+
+<div class="row justify-content-center my-4">
+    <div class="col-md-7 col-lg-6">
+        <div class="card shadow-sm border-0 rounded-3">
+            <div class="card-header bg-primary text-white p-3 text-center">
+                <h4 class="mb-0 fw-bold">
+                    <i class="bi bi-plus-circle me-2"></i>Thêm Chuyên Khoa Mới
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="tenCK" class="form-label fw-bold">Tên Chuyên Khoa <span
+                            class="text-danger">*</span></label>
+                            <input asp-for="tenCK" class="form-control" placeholder="Ví dụ: Khoa Tim Mạch..." required />
+                            <span asp-validation-for="tenCK" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="TrangThaiCK" class="form-label fw-bold">Trạng Thái Hoạt Động <span
+                                class="text-danger">*</span></label>
+                                <select asp-for="TrangThaiCK" class="form-select border-primary fw-semibold"
+                                        asp-items="Html.GetEnumSelectList<TrangThaiChuyenKhoa>()" required>
+                                </select>
+                                <span asp-validation-for="TrangThaiCK" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-4">
+                                <label asp-for="motaCK" class="form-label fw-bold">Mô Tả Chuyên Khoa</label>
+                                <textarea asp-for="motaCK" class="form-control" rows="3"
+                                          placeholder="Nhập mô tả thông tin chuyên khoa..."></textarea>
+                                <span asp-validation-for="motaCK" class="text-danger"></span>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                                <a asp-action="Index" class="btn btn-outline-secondary fw-semibold">
+                                    <i class="bi bi-arrow-left me-1"></i> Quay lại
+                                </a>
+                                <button type="submit" class="btn btn-primary fw-semibold px-4 shadow-sm">
+                                    <i class="bi bi-check-circle me-1"></i> Lưu Chuyên Khoa
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @section Scripts {
+            @{
+                await Html.RenderPartialAsync("_ValidationScriptsPartial");
+            }
+        }

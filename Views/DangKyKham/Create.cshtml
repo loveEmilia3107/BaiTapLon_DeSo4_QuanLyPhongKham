@@ -1,0 +1,114 @@
+@using Microsoft.AspNetCore.Http
+@using static QuanLyPhongKham.Models.DangKyKham
+@model QuanLyPhongKham.Models.DangKyKham
+
+@{
+    ViewData["Title"] = "Đăng ký khám bệnh";
+
+    int? currentRole = Context.Session.GetInt32("Role");
+    bool isAdmin = currentRole.HasValue && currentRole.Value == 0;
+    bool showAllBN = ViewBag.ShowAllBN ?? false;
+}
+
+<div class="row justify-content-center my-4">
+    <div class="col-md-8 col-lg-7">
+        <div class="card shadow-sm border-0 rounded-3">
+            <!-- HEADER -->
+            <div class="card-header bg-primary text-white p-3 text-center">
+                <h4 class="mb-0 fw-bold">
+                    <i class="bi bi-journal-plus me-2"></i>Đăng Ký Khám Bệnh
+                </h4>
+            </div>
+
+            <!-- FORM BODY -->
+            <div class="card-body p-4">
+                <form asp-action="Create" asp-route-showAllBN="@showAllBN">
+                    <!-- 🛑 CẢNH BÁO LỖI -->
+                    <div asp-validation-summary="All" class="alert alert-danger shadow-sm border-0" role="alert"
+                         style="@(ViewData.ModelState.IsValid ? "display:none;" : "")">
+                    </div>
+
+                    <!-- 🛑 TOGGLE DÀNH CHO ADMIN: BẬT / TẮT XEM TOÀN BỘ BỆNH NHÂN ĐỂ ĐĂNG KÝ HỘ -->
+                    @if (isAdmin)
+                    {
+                        <div class="alert alert-info d-flex justify-content-between align-items-center mb-3 p-3 rounded-3 border-0 shadow-sm">
+                            <div>
+                                <i class="bi bi-person-gear fs-5 me-2 text-info"></i>
+                                <strong class="text-dark">Chế độ Admin:</strong>
+                                <span class="text-muted small">@(showAllBN ? "Đang hiện TOÀN BỘ Bệnh nhân để đăng ký hộ" :
+                                             "Đang chỉ hiện Bệnh nhân cá nhân")</span>
+                                </div>
+                                <div class="form-check form-switch m-0">
+                                    <input class="form-check-input" type="checkbox" id="toggleShowAllBN" @(showAllBN ? "checked" : "")
+                                           onchange="location.href='@Url.Action("Create", "DangKyKham", new { maLK = Model.mlk })&showAllBN=' + this.checked" />
+                                    <label class="form-check-label fw-bold text-primary ms-1" for="toggleShowAllBN">
+                                        Đăng ký hộ
+                                    </label>
+                                </div>
+                            </div>
+                        }
+
+                        <div class="row g-3">
+                            <!-- CHỌN BỆNH NHÂN -->
+                            <div class="col-md-6">
+                                <label asp-for="ooBN" class="form-label fw-bold">
+                                    Bệnh nhân khám <span class="text-danger">*</span>
+                                </label>
+                                <select asp-for="ooBN" class="form-select" asp-items="ViewBag.ooBN" required>
+                                    <option value="">-- Chọn bệnh nhân --</option>
+                                </select>
+                                <span asp-validation-for="ooBN" class="text-danger"></span>
+                                <small class="form-text text-muted">
+                                    <a asp-controller="BenhNhan" asp-action="Create"
+                                       class="text-primary text-decoration-none">
+                                        <i class="bi bi-plus-circle me-1"></i>Thêm bệnh nhân mới?
+                                    </a>
+                                </small>
+                            </div>
+
+                            <!-- LỊCH KHÁM ĐÃ CHỌN (READ-ONLY) -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Ca khám đã chọn</label>
+                                <select class="form-select bg-light fw-semibold text-primary border-primary"
+                                        asp-items="ViewBag.mlk" disabled>
+                                </select>
+                                <input type="hidden" asp-for="mlk" />
+                                <span asp-validation-for="mlk" class="text-danger"></span>
+                            </div>
+
+                            <!-- NGÀY ĐĂNG KÝ -->
+                            <div class="col-md-12">
+                                <label asp-for="ngayDK" class="form-label fw-bold">Thời gian đăng ký thực hiện</label>
+                                <input asp-for="ngayDK" class="form-control bg-light" type="date" />
+                                <span asp-validation-for="ngayDK" class="text-danger"></span>
+                            </div>
+
+                            <!-- LÝ DO KHÁM -->
+                            <div class="col-12">
+                                <label asp-for="LiDo" class="form-label fw-bold">Lý do khám / Triệu chứng ban đầu</label>
+                                <textarea asp-for="LiDo" class="form-control" rows="3"
+                                          placeholder="Mô tả ngắn gọn triệu chứng hoặc lý do khám..."></textarea>
+                                <span asp-validation-for="LiDo" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- FOOTER BUTTONS -->
+                        <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+                            <a asp-controller="LichKham" asp-action="Index" class="btn btn-outline-secondary fw-semibold">
+                                <i class="bi bi-arrow-left me-1"></i> Quay lại Lịch khám
+                            </a>
+                            <button type="submit" class="btn btn-success fw-semibold px-4 shadow-sm">
+                                <i class="bi bi-check-circle me-1"></i> Xác Nhận Đăng Ký
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @section Scripts {
+        @{
+            await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        }
+    }

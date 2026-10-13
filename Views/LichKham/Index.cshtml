@@ -1,0 +1,333 @@
+@using Microsoft.AspNetCore.Http
+@using static QuanLyPhongKham.Models.BacSi
+@using static QuanLyPhongKham.Models.ChuyenKhoa
+@using static QuanLyPhongKham.Models.LichKham
+@model IEnumerable<QuanLyPhongKham.Models.LichKham>
+
+@{
+    ViewData["Title"] = "Danh sách Lịch khám";
+
+    int? currentRole = Context.Session.GetInt32("Role");
+    bool isAdmin = currentRole.HasValue && currentRole.Value == 0;
+    bool isLoggedIn = Context.Session.GetInt32("AccID").HasValue && Context.Session.GetInt32("AccID").Value > 0;
+    
+    int? maBSChon = ViewBag.MaBSChon;
+    string? tenBSChon = ViewBag.TenBacSiDangChon;
+}
+
+<!-- HEADER TRANG -->
+<div class="card shadow-sm border-0 mb-4 rounded-3">
+    <div class="card-body p-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div>
+                <h3 class="fw-bold text-primary mb-1">
+                    <i class="bi bi-calendar-week-fill me-2"></i>Lịch Trình Khám Bệnh
+                </h3>
+                @if (maBSChon.HasValue && !string.IsNullOrEmpty(tenBSChon))
+                {
+                    <p class="text-muted mb-0">
+                        Đang lọc theo ca khám của <strong class="text-primary">BS. @tenBSChon</strong>
+                        <a asp-action="Index" class="btn btn-sm btn-outline-secondary ms-2 py-0 fs-7">
+                            <i class="bi bi-x-circle me-1"></i> Bỏ lọc
+                        </a>
+                    </p>
+                }
+                else
+                {
+                    <p class="text-muted mb-0">Quản lý các ca lịch khám, thời gian làm việc và số lượng tiếp nhận bệnh nhân
+                    </p>
+                }
+            </div>
+            @if (isAdmin)
+            {
+                <div>
+                    <a asp-action="Create" class="btn btn-success fw-semibold shadow-sm">
+                        <i class="bi bi-plus-lg me-1"></i> Tạo Ca Lịch Khám Mới
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show my-3 shadow-sm border-0" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i> @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show my-3 shadow-sm border-0" role="alert">
+        <i class="bi bi-check-circle-fill me-2 fs-5"></i> @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (Model != null && Model.Any())
+{
+    <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-primary text-white">
+                    <tr>
+                        <th class="py-3 px-4">Mã Ca</th>
+                        <th class="py-3 px-3">Bác Sĩ Phụ Trách</th>
+                        <th class="py-3 px-3">Ngày Khám</th>
+                        <th class="py-3 px-3">Khung Giờ</th>
+                        <th class="py-3 px-3 text-center">Số Lượng Chỗ</th>
+                        <th class="py-3 px-3 text-center">Trạng Thái Ca</th>
+                        <th class="py-3 px-4 text-end" style="min-width: 220px;">Thao Tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        bool isRetired = item.bs != null && item.bs.TrangThaiBS == TrangThaiBacSi.DaNghiLam;
+                        bool isCKDisabled = item.bs != null && item.bs.mCK != null && item.bs.mCK.TrangThaiCK !=
+                TrangThaiChuyenKhoa.DangHoatDong;
+                        bool isLKDisabled = item.TrangThaiLK != TrangThaiLichKham.ConNhanDK;
+                        bool isFull = item.currentSL >= item.maxSL;
+                        bool isBSTamNghi = item.bs != null && item.bs.TrangThaiBS == TrangThaiBacSi.TamNghi;
+
+                        <tr>
+                            <!-- MÃ CA KHÁM -->
+                            <td class="px-4 fw-bold text-secondary">
+                                #@item.maLK
+                            </td>
+
+                            <!-- BÁC SĨ PHỤ TRÁCH -->
+                            <td class="px-3">
+                                @if (item.bs != null)
+                                {
+                                    <div class="fw-bold text-dark">
+                                        <i class="bi bi-person-circle me-1 text-primary"></i>BS. @item.bs.tenBS
+                                    </div>
+                                    <small class="text-muted">
+                                        @(item.bs.mCK != null ? item.bs.mCK.tenCK : "Chưa xếp khoa")
+                                    </small>
+                                }
+                                else
+                                {
+                                    <span class="text-muted fst-italic">Chưa phân công</span>
+                                }
+                            </td>
+
+                            <!-- NGÀY KHÁM -->
+                            <td class="px-3 fw-semibold text-dark">
+                                <i class="bi bi-calendar-event me-1 text-success"></i>
+                                @item.ngayKham.ToString("dd/MM/yyyy")
+                            </td>
+
+                            <!-- KHUNG GIỜ KHÁM -->
+                            <td class="px-3">
+                                <span class="badge bg-light text-dark border font-monospace px-2 py-1">
+                                    <i class="bi bi-clock me-1 text-info"></i>
+                                    @item.gioBatdau.ToString(@"HH\:mm") - @item.gioKetthuc.ToString(@"HH\:mm")
+                                </span>
+                            </td>
+
+                            <!-- SỐ LƯỢNG CHỖ (CURRENT / MAX) -->
+                            <td class="px-3 text-center">
+                                @if (isFull)
+                                {
+                                    <span class="badge bg-danger rounded-pill px-3 py-1">
+                                        @item.currentSL / @item.maxSL (Đã đủ)
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span
+                                        class="badge bg-success-subtle text-success border border-success rounded-pill px-3 py-1 fw-bold">
+                                        Còn @(item.maxSL - item.currentSL) / @item.maxSL chỗ
+                                    </span>
+                                }
+                            </td>
+
+                            <!-- TRẠNG THÁI CA KHÁM -->
+                            <td class="px-3 text-center">
+                                @if (isRetired)
+                                {
+                                    <span class="badge bg-danger rounded-pill px-3 py-2">BS đã nghỉ làm</span>
+                                }
+                                else if (isCKDisabled)
+                                {
+                                    <span class="badge bg-secondary rounded-pill px-3 py-2">Khoa tạm ngưng</span>
+                                }
+                                else if (isLKDisabled)
+                                {
+                                    <span class="badge bg-secondary rounded-pill px-3 py-2">Lịch tạm ngưng</span>
+                                }
+                                else if (isFull)
+                                {
+                                    <span class="badge bg-danger rounded-pill px-3 py-2">Đã hết chỗ</span>
+                                }
+                                else if (isBSTamNghi)
+                                {
+                                    <span class="badge bg-warning text-dark rounded-pill px-3 py-2">BS tạm nghỉ</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success rounded-pill px-3 py-2">Còn nhận đăng ký</span>
+                                }
+                            </td>
+
+                            <!-- THAO TÁC ĐẶT LỊCH HOẶC QUẢN LÝ -->
+                            <td class="px-4 text-end">
+                                <div class="d-inline-flex gap-1 align-items-center">
+                                    <!-- 🛑 BẪY NÚT BẤM ĐẶT LỊCH KHÁM BỆNH NHÂN -->
+                                    @if (isRetired)
+                                    {
+                                        <button class="btn btn-sm btn-outline-secondary fw-semibold" disabled
+                                                title="Bác sĩ đã nghỉ làm">
+                                            <i class="bi bi-x-circle me-1"></i> BS Đã Nghỉ
+                                        </button>
+                                    }
+                                    else if (isCKDisabled)
+                                    {
+                                        <button class="btn btn-sm btn-outline-secondary fw-semibold" disabled
+                                                title="Chuyên khoa đang tạm dừng hoạt động">
+                                            <i class="bi bi-slash-circle me-1"></i> Khoa Đóng
+                                        </button>
+                                    }
+                                    else if (isLKDisabled)
+                                    {
+                                        <button class="btn btn-sm btn-outline-secondary fw-semibold" disabled
+                                                title="Ca lịch khám này hiện đang tạm ngưng">
+                                            <i class="bi bi-pause-circle me-1"></i> Lịch Ngưng
+                                        </button>
+                                    }
+                                    else if (isFull)
+                                    {
+                                        <button class="btn btn-sm btn-outline-danger fw-semibold" disabled
+                                                title="Ca khám này đã đủ số lượng bệnh nhân">
+                                            <i class="bi bi-person-x me-1"></i> Đã Đủ Chỗ
+                                        </button>
+                                    }
+                                    else if (isBSTamNghi)
+                                    {
+                                        <!-- BÁC SĨ TẠM NGHỈ NHƯNG KHOA MỞ + MỜI ĐẶT TRƯỚC -->
+                                        @if (isLoggedIn)
+                                        {
+                                            <a asp-controller="DangKyKham" asp-action="Create" asp-route-maLK="@item.maLK"
+                                               class="btn btn-sm btn-warning text-dark fw-bold shadow-sm"
+                                               title="Bác sĩ đang tạm nghỉ, đăng ký trước để giữ chỗ">
+                                                <i class="bi bi-clock-history me-1"></i> Đặt Trước
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <button type="button" class="btn btn-sm btn-warning text-dark fw-bold shadow-sm"
+                                                    data-bs-toggle="modal" data-bs-target="#requireLoginModal"
+                                                    data-feature="đặt giữ chỗ trước ca lịch khám này">
+                                                <i class="bi bi-clock-history me-1"></i> Đặt Trước
+                                            </button>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <!-- MỞ NÚT ĐẶT LỊCH BÌNH THƯỜNG -->
+                                        @if (isLoggedIn)
+                                        {
+                                            <a asp-controller="DangKyKham" asp-action="Create" asp-route-maLK="@item.maLK"
+                                               class="btn btn-sm btn-primary fw-bold shadow-sm">
+                                                <i class="bi bi-calendar-plus me-1"></i> Đặt Lịch
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <button type="button" class="btn btn-sm btn-primary fw-bold shadow-sm"
+                                                    data-bs-toggle="modal" data-bs-target="#requireLoginModal"
+                                                    data-feature="đặt lịch khám bệnh">
+                                                <i class="bi bi-calendar-plus me-1"></i> Đặt Lịch
+                                            </button>
+                                        }
+                                    }
+
+                                    <!-- XEM CHI TIẾT CA KHÁM -->
+                                    <a asp-action="Details" asp-route-id="@item.maLK" class="btn btn-sm btn-outline-info"
+                                       title="Xem chi tiết">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+
+                                    <!-- NÚT EDIT VÀ DELETE DÀNH CHO ADMIN -->
+                                    @if (isAdmin)
+                                    {
+                                        <a asp-action="Edit" asp-route-id="@item.maLK" class="btn btn-sm btn-outline-primary"
+                                           title="Chỉnh sửa ca khám">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+
+                                        <!-- MODAL XÓA TRỰC TIẾP -->
+                                        <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal"
+                                                data-bs-target="#deleteModal-@item.maLK" title="Xóa ca khám">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+
+                                        <!-- MODAL CONFIRM DELETE -->
+                                        <div class="modal fade" id="deleteModal-@item.maLK" tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered text-start">
+                                                <div class="modal-content border-0 shadow">
+                                                    <div class="modal-header bg-danger text-white">
+                                                        <h5 class="modal-title fw-bold">
+                                                            <i class="bi bi-exclamation-triangle-fill me-2"></i>Xác Nhận Xóa Ca Lịch
+                                                            Khám
+                                                        </h5>
+                                                        <button type="button" class="btn-close btn-close-white"
+                                                                data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body p-4">
+                                                        <p class="mb-2 text-dark fs-6">
+                                                            Bạn có chắc chắn muốn xóa ca lịch khám mã <strong
+                                                            class="text-danger">#@item.maLK</strong> ngày
+                                                            <strong>@item.ngayKham.ToString("dd/MM/yyyy")</strong> không?
+                                                        </p>
+                                                        <div class="alert alert-warning mb-0 p-2 small">
+                                                            <i class="bi bi-info-circle me-1"></i>Lưu ý: Chỉ xóa được khi tất cả các
+                                                            phiếu đăng ký khám thuộc ca này đã được xử lý hoàn tất hoặc đã hủy.
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer bg-light p-3">
+                                                        <button type="button" class="btn btn-outline-secondary fw-semibold"
+                                                                data-bs-dismiss="modal">
+                                                            <i class="bi bi-x-circle me-1"></i> Hủy
+                                                        </button>
+                                                        <form asp-action="Delete" asp-route-id="@item.maLK" method="post"
+                                                              class="d-inline">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" class="btn btn-danger fw-bold shadow-sm px-4">
+                                                                <i class="bi bi-trash-fill me-1"></i> Xóa Ca Khám
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+else
+{
+    <div class="card shadow-sm border-0 rounded-3 text-center p-5">
+        <div class="card-body">
+            <i class="bi bi-calendar-x text-muted display-1 mb-3"></i>
+            <h4 class="fw-bold text-dark mb-2">Không tìm thấy ca lịch khám nào!</h4>
+            <p class="text-muted">Hệ thống hiện tại chưa có dữ liệu lịch khám phù hợp.</p>
+            @if (isAdmin)
+            {
+                <a asp-action="Create" class="btn btn-primary mt-2 fw-semibold">
+                    <i class="bi bi-plus-lg me-1"></i> Tạo Ca Lịch Khám Mới
+                </a>
+            }
+        </div>
+    </div>
+}

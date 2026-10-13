@@ -1,0 +1,91 @@
+@using Microsoft.AspNetCore.Http
+@model QuanLyPhongKham.Models.BenhNhan
+
+@{
+    ViewData["Title"] = "Chi Tiết Hồ Sơ Bệnh Nhân";
+
+    int? currentRole = Context.Session.GetInt32("Role");
+    bool isAdmin = currentRole == 0;
+}
+
+<div class="row justify-content-center my-4">
+    <div class="col-md-8 col-lg-7">
+        <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
+            <!-- HEADER -->
+            <div class="card-header bg-primary text-white p-3 text-center">
+                <h4 class="mb-0 fw-bold">
+                    <i class="bi bi-person-badge me-2"></i>Hồ Sơ Bệnh Nhân #@Model.maBN
+                </h4>
+            </div>
+
+            <!-- BODY -->
+            <div class="card-body p-4">
+                <div class="row g-3">
+                    <!-- HỌ TÊN -->
+                    <div class="col-md-6 border-bottom pb-3">
+                        <label class="text-muted small fw-bold d-block text-uppercase">Họ Và Tên Bệnh Nhân</label>
+                        <span class="fs-5 fw-bold text-dark">
+                            <i class="bi bi-person-circle text-primary me-1"></i> @Model.tenBN
+                        </span>
+                    </div>
+
+                    <!-- NGÀY SINH -->
+                    <div class="col-md-6 border-bottom pb-3">
+                        <label class="text-muted small fw-bold d-block text-uppercase">Ngày Sinh</label>
+                        <span class="fs-6 fw-semibold text-dark">
+                            <i class="bi bi-calendar-event me-1 text-secondary"></i>
+                            @(Model.nsBN != default ? Model.nsBN.ToString("dd/MM/yyyy") : "Chưa cập nhật")
+                        </span>
+                    </div>
+
+                    <!-- SỐ ĐIỆN THOẠI -->
+                    <div class="col-md-6 border-bottom pb-3">
+                        <label class="text-muted small fw-bold d-block text-uppercase">Số Điện Thoại Liên Hệ</label>
+                        <span class="fs-6 fw-semibold text-dark">
+                            <i class="bi bi-telephone me-1 text-success"></i>
+                            @(string.IsNullOrEmpty(Model.sdtBN) ? "Chưa cập nhật" : Model.sdtBN)
+                        </span>
+                    </div>
+
+                    <!-- EMAIL -->
+                    <div class="col-md-6 border-bottom pb-3">
+                        <label class="text-muted small fw-bold d-block text-uppercase">Địa Chỉ Email</label>
+                        <span class="fs-6 fw-semibold text-dark">
+                            <i class="bi bi-envelope me-1 text-info"></i>
+                            @(string.IsNullOrEmpty(Model.email) ? "Chưa cập nhật" : Model.email)
+                        </span>
+                    </div>
+
+                    <!-- TÀI KHOẢN SỞ HỮU -->
+                    <div class="col-md-12 border-bottom pb-3">
+                        <label class="text-muted small fw-bold d-block text-uppercase">Tài Khoản Sở Hữu Hồ Sơ</label>
+                        <span class="badge bg-light text-dark fs-6 border fw-normal p-2 mt-1">
+                            <i class="bi bi-shield-lock text-warning me-1"></i> Mã TK: #@Model.mtk
+                            @(Model.mTK != null ? $" - SĐT: {Model.mTK.sdt}" : "")
+                        </span>
+                    </div>
+
+                    <!-- ĐỊA CHỈ -->
+                    <div class="col-12 mt-2">
+                        <label class="text-muted small fw-bold d-block">ĐỊA CHỈ THƯỜNG TRÚ</label>
+                        <div class="p-3 bg-light border rounded-3 text-secondary mt-1">
+                            <i class="bi bi-geo-alt-fill text-danger me-1"></i>
+                            @(string.IsNullOrEmpty(Model.diachi) ? "Chưa cập nhật địa chỉ." : Model.diachi)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FOOTER BUTTONS -->
+                <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+                    <a asp-action="Index" class="btn btn-outline-secondary fw-semibold">
+                        <i class="bi bi-arrow-left me-1"></i> Quay lại Danh sách
+                    </a>
+
+                    <a asp-action="Edit" asp-route-id="@Model.maBN" class="btn btn-primary fw-semibold px-4 shadow-sm">
+                        <i class="bi bi-pencil me-1"></i> Chỉnh Sửa Hồ Sơ
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

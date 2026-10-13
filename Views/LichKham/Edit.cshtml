@@ -1,0 +1,98 @@
+@using static QuanLyPhongKham.Models.LichKham
+@model QuanLyPhongKham.Models.LichKham
+
+@{
+    ViewData["Title"] = "Cập Nhật Lịch Khám";
+}
+
+<div class="row justify-content-center my-4">
+    <div class="col-md-7 col-lg-6">
+        <div class="card shadow-sm border-0 rounded-3">
+            <div class="card-header bg-primary text-white p-3 text-center">
+                <h4 class="mb-0 fw-bold">
+                    <i class="bi bi-pencil-square me-2"></i>Cập Nhật Ca Lịch Khám #@Model.maLK
+                </h4>
+            </div>
+
+            <div class="card-body p-4">
+                <form asp-action="Edit" method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                    <input type="hidden" asp-for="maLK" />
+
+                    <!-- BÁC SĨ PHỤ TRÁCH -->
+                    <div class="mb-3">
+                        <label asp-for="mmbs" class="form-label fw-bold">Bác Sĩ Phụ Trách <span
+                            class="text-danger">*</span></label>
+                            <select asp-for="mmbs" class="form-select border-primary fw-semibold" asp-items="ViewBag.mmbs"
+                                    required></select>
+                            <span asp-validation-for="mmbs" class="text-danger"></span>
+                        </div>
+
+                        <!-- NGÀY KHÁM -->
+                        <div class="mb-3">
+                            <label asp-for="ngayKham" class="form-label fw-bold">Ngày Khám <span
+                                class="text-danger">*</span></label>
+                                <input asp-for="ngayKham" type="date" class="form-control" required />
+                                <span asp-validation-for="ngayKham" class="text-danger"></span>
+                            </div>
+
+                            <!-- KHUNG GIỜ (BẮT ĐẦU & KẾT THÚC) -->
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label asp-for="gioBatdau" class="form-label fw-bold">Giờ Bắt Đầu <span
+                                        class="text-danger">*</span></label>
+                                        <input asp-for="gioBatdau" type="time" class="form-control" required />
+                                        <span asp-validation-for="gioBatdau" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label asp-for="gioKetthuc" class="form-label fw-bold">Giờ Kết Thúc <span
+                                            class="text-danger">*</span></label>
+                                            <input asp-for="gioKetthuc" type="time" class="form-control" required />
+                                            <span asp-validation-for="gioKetthuc" class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                    <!-- SỐ LƯỢNG TỐI ĐA -->
+                                    <div class="mb-3">
+                                        <label asp-for="maxSL" class="form-label fw-bold">Số Lượng Bệnh Nhận Tối Đa <span
+                                            class="text-danger">*</span></label>
+                                            <input asp-for="maxSL" type="number" class="form-control" min="1"
+                                                   placeholder="Nhập số lượng chỗ..." required />
+                                            <small class="text-muted d-block mt-1">
+                                                <i class="bi bi-info-circle-fill me-1 text-primary"></i>
+                                                Số lượng đã đăng ký hiện tại: <strong class="text-success">@Model.currentSL</strong> chỗ.
+                                                (Số tối đa không được nhỏ hơn con số này).
+                                            </small>
+                                            <span asp-validation-for="maxSL" class="text-danger"></span>
+                                        </div>
+
+                                        <!-- TRẠNG THÁI LỊCH KHÁM -->
+                                        <div class="mb-4">
+                                            <label asp-for="TrangThaiLK" class="form-label fw-bold">Trạng Thái Lịch Khám <span
+                                                class="text-danger">*</span></label>
+                                                <select asp-for="TrangThaiLK" class="form-select border-primary fw-semibold"
+                                                        asp-items="Html.GetEnumSelectList<TrangThaiLichKham>()" required>
+                                                </select>
+                                                <span asp-validation-for="TrangThaiLK" class="text-danger"></span>
+                                            </div>
+
+                                            <!-- NÚT THAO TÁC -->
+                                            <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                                                <a asp-action="Index" class="btn btn-outline-secondary fw-semibold">
+                                                    <i class="bi bi-arrow-left me-1"></i> Quay lại
+                                                </a>
+                                                <button type="submit" class="btn btn-primary fw-semibold px-4 shadow-sm">
+                                                    <i class="bi bi-check-circle me-1"></i> Lưu Cập Nhật
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        @section Scripts {
+                            @{
+                                await Html.RenderPartialAsync("_ValidationScriptsPartial");
+                            }
+                        }

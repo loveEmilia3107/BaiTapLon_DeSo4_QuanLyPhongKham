@@ -1,0 +1,166 @@
+@using Microsoft.AspNetCore.Http
+@using static QuanLyPhongKham.Models.DangKyKham
+@model QuanLyPhongKham.Models.DangKyKham
+
+@{
+    ViewData["Title"] = "Cập nhật Phiếu Đăng Ký Khám";
+
+    int? currentRole = Context.Session.GetInt32("Role");
+    bool isAdmin = currentRole.HasValue && currentRole.Value == 0;
+    bool showAllBN = ViewBag.ShowAllBN ?? false;
+}
+
+<div class="row justify-content-center my-4">
+    <div class="col-md-8 col-lg-7">
+        <div class="card shadow-sm border-0 rounded-3">
+            <!-- HEADER -->
+            <div class="card-header bg-primary text-white p-3 text-center">
+                <h4 class="mb-0 fw-bold">
+                    <i class="bi bi-pencil-square me-2"></i>Cập Nhật Phiếu Đăng Ký Khám #@Model.maPhieu
+                </h4>
+            </div>
+
+            <!-- FORM BODY -->
+            <div class="card-body p-4">
+                <form asp-action="Edit" asp-route-showAllBN="@showAllBN">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                    <input type="hidden" asp-for="maPhieu" />
+
+                    <!-- 🛑 TOGGLE CHẾ ĐỘ DÀNH DỰA TRÊN QUYỀN ADMIN -->
+                    @if (isAdmin)
+                    {
+                        <div class="alert alert-info d-flex justify-content-between align-items-center mb-3 p-3 rounded-3 border-0 shadow-sm">
+                            <div>
+                                <i class="bi bi-person-gear fs-5 me-2 text-info"></i>
+                                <strong class="text-dark">Chế độ Admin:</strong>
+                                <span class="text-muted small">
+                                    @(showAllBN ? "Đang hiện TOÀN BỘ Bệnh nhân hệ thống" : "Đang chỉ hiện Bệnh nhân cá nhân")
+                                </span>
+                            </div>
+                            <div class="form-check form-switch m-0">
+                                <input class="form-check-input" type="checkbox" id="toggleShowAllBN" @(showAllBN ? "checked" : "")
+                                       onchange="location.href='@Url.Action("Edit", "DangKyKham", new { id = Model.maPhieu })?showAllBN=' + this.checked" />
+                                <label class="form-check-label fw-bold text-primary ms-1" for="toggleShowAllBN">
+                                    Sửa toàn bộ BN
+                                </label>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="row g-3">
+                        <!-- BỆNH NHÂN -->
+                        <!-- BỆNH NHÂN -->
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label asp-for="ooBN" class="form-label fw-bold mb-0">
+                                    Bệnh Nhân Khám <span class="text-danger">*</span>
+                                </label>
+                                @if (isAdmin)
+                                {
+                                    <small class="text-muted">
+                                        <i class="bi bi-shield-check text-primary me-1"></i>(Admin chọn lại thoải mái)
+                                    </small>
+                                }
+                            </div>
+
+                            @if (isAdmin)
+                            {
+                                <!-- ADMIN: Cho phép chọn lại bất kỳ Bệnh nhân nào trong ViewBag.ooBN -->
+                                <select asp-for="ooBN" class="form-select fw-semibold border-primary"
+                                        asp-items="ViewBag.ooBN" required>
+                                    <option value="">-- Chọn bệnh nhân --</option>
+                                </select>
+                            }
+                            else if (Model.TrangThaiDK == QuanLyPhongKham.Models.DangKyKham.TrangThaiDangKy.ChoXacNhan)
+                            {
+                                <!-- BỆNH NHÂN THƯỜNG: Vẫn được chọn đổi giữa các hồ sơ do chính mình sở hữu khi đơn Chờ xác nhận -->
+                                <select asp-for="ooBN" class="form-select" asp-items="ViewBag.ooBN" required></select>
+                            }
+                            else
+                            {
+                                <!-- KHÓA BẰNG KHI ĐÃ XÁC NHẬN / ĐÃ KHÁM / ĐÃ HỦY -->
+                                <select asp-for="ooBN" class="form-select bg-light" asp-items="ViewBag.ooBN"
+                                        disabled></select>
+                                <input type="hidden" asp-for="ooBN" />
+                            }
+                            <span asp-validation-for="ooBN" class="text-danger"></span>
+                        </div>
+
+                        <!-- LỊCH KHÁM -->
+                        <div class="col-md-6">
+                            <label asp-for="mlk" class="form-label fw-bold">
+                                Ca Lịch Khám <span class="text-danger">*</span>
+                            </label>
+                            @if (isAdmin)
+                            {
+                                <select asp-for="mlk" class="form-select" asp-items="ViewBag.mlk" required></select>
+                            }
+                            else
+                            {
+                                <select asp-for="mlk" class="form-select" asp-items="ViewBag.mlk" readonly tabindex="-1"
+                                        style="pointer-events: none; background-color: #e9ecef;"></select>
+                                <input type="hidden" asp-for="mlk" />
+                            }
+                            <span asp-validation-for="mlk" class="text-danger"></span>
+                        </div>
+
+                        <!-- NGÀY ĐĂNG KÝ -->
+                        <div class="col-md-6">
+                            <label asp-for="ngayDK" class="form-label fw-bold">
+                                Thời Gian Đăng Ký <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="ngayDK" class="form-control" type="date" required />
+                            <span asp-validation-for="ngayDK" class="text-danger"></span>
+                        </div>
+
+                        <!-- TRẠNG THÁI ĐĂNG KÝ (RENDER TẤT CẢ TỰ ĐỘNG BẮT ĐÚNG GIÁ TRỊ ENUM) -->
+                        <div class="col-md-6">
+                            <label asp-for="TrangThaiDK" class="form-label fw-bold">
+                                Trạng Thái Đơn <span class="text-danger">*</span>
+                            </label>
+                            @if (isAdmin)
+                            {
+                                <select asp-for="TrangThaiDK" class="form-select fw-semibold"
+                                        asp-items="Html.GetEnumSelectList<TrangThaiDangKy>()" required>
+                                </select>
+                            }
+                            else
+                            {
+                                <select asp-for="TrangThaiDK" class="form-select fw-semibold"
+                                        asp-items="Html.GetEnumSelectList<TrangThaiDangKy>()" disabled
+                                        style="background-color: #e9ecef;">
+                                </select>
+                                <input type="hidden" asp-for="TrangThaiDK" />
+                            }
+                            <span asp-validation-for="TrangThaiDK" class="text-danger"></span>
+                        </div>
+
+                        <!-- LÝ DO KHÁM -->
+                        <div class="col-12">
+                            <label asp-for="LiDo" class="form-label fw-bold">Lý Do Khám / Triệu Chứng</label>
+                            <textarea asp-for="LiDo" class="form-control" rows="3"
+                                      placeholder="Nhập lý do khám hoặc mô tả triệu chứng..."></textarea>
+                            <span asp-validation-for="LiDo" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <!-- BUTTONS -->
+                    <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+                        <a asp-action="Index" class="btn btn-outline-secondary fw-semibold">
+                            <i class="bi bi-arrow-left me-1"></i> Quay lại
+                        </a>
+                        <button type="submit" class="btn btn-primary fw-semibold px-4 shadow-sm">
+                            <i class="bi bi-check-circle me-1"></i> Lưu Cập Nhật
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

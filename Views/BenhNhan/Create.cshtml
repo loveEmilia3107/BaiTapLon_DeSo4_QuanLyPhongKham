@@ -1,0 +1,105 @@
+@using Microsoft.AspNetCore.Http
+@model QuanLyPhongKham.Models.BenhNhan
+
+@{
+    ViewData["Title"] = "Thêm Hồ sơ Bệnh nhân";
+
+    int? currentRole = Context.Session.GetInt32("Role");
+    bool isAdmin = currentRole == 0;
+}
+
+<div class="row justify-content-center my-4">
+    <div class="col-md-7 col-lg-6">
+        <div class="card shadow-sm border-0 rounded-3">
+            <!-- HEADER -->
+            <div class="card-header bg-primary text-white p-3 text-center">
+                <h4 class="mb-0 fw-bold">
+                    <i class="bi bi-person-plus-fill me-2"></i>Thêm Hồ Sơ Bệnh Nhân Mới
+                </h4>
+            </div>
+
+            <!-- FORM BODY -->
+            <div class="card-body p-4">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                    <!-- 🛑 CHỌN TÀI KHOẢN SỞ HỮU (DÀNH CHO ADMIN CÓ QUYỀN TẠO HỘ) -->
+                    @if (isAdmin)
+                    {
+                        <div class="mb-3">
+                            <label asp-for="mtk" class="form-label fw-bold">
+                                Tài Khoản Chủ Sở Hữu <span class="text-danger">*</span>
+                            </label>
+                            <select asp-for="mtk" class="form-select border-primary fw-semibold" asp-items="ViewBag.mtk"
+                                    required></select>
+                            <small class="form-text text-muted">
+                                <i class="bi bi-shield-check text-primary me-1"></i>Chế độ Admin: Chọn tài khoản sẽ gán hồ
+                                sơ bệnh nhân này.
+                            </small>
+                        </div>
+                    }
+
+                    <!-- HỌ VÀ TÊN -->
+                    <div class="mb-3">
+                        <label asp-for="tenBN" class="form-label fw-bold">
+                            Họ và tên Bệnh nhân <span class="text-danger">*</span>
+                        </label>
+                        <input asp-for="tenBN" class="form-control" placeholder="Ví dụ: Nguyễn Văn A..." required />
+                        <span asp-validation-for="tenBN" class="text-danger"></span>
+                    </div>
+
+                    <!-- NGÀY SINH -->
+                    <div class="mb-3">
+                        <label asp-for="nsBN" class="form-label fw-bold">
+                            Ngày sinh <span class="text-danger">*</span>
+                        </label>
+                        <input asp-for="nsBN" type="date" class="form-control" required />
+                        <span asp-validation-for="nsBN" class="text-danger"></span>
+                    </div>
+
+                    <!-- SỐ ĐIỆN THOẠI (FALLBACK SĐT TÀI KHOẢN) -->
+                    <div class="mb-3">
+                        <label asp-for="sdtBN" class="form-label fw-bold">Số điện thoại liên hệ</label>
+                        <input asp-for="sdtBN" class="form-control"
+                               placeholder="Để trống sẽ tự lấy SĐT tài khoản (@ViewBag.DefaultSDT)" />
+                        <span asp-validation-for="sdtBN" class="text-danger"></span>
+                        <small class="form-text text-muted">
+                            <i class="bi bi-info-circle me-1"></i>CÚT
+                        </small>
+                    </div>
+
+                    <!-- EMAIL (FALLBACK EMAIL TÀI KHOẢN) -->
+                    <div class="mb-3">
+                        <label asp-for="email" class="form-label fw-bold">Email liên hệ</label>
+                        <input asp-for="email" type="email" class="form-control" placeholder="Nhập email, nếu có" />
+                        <span asp-validation-for="email" class="text-danger"></span>
+                    </div>
+
+                    <!-- ĐỊA CHỈ -->
+                    <div class="mb-4">
+                        <label asp-for="diachi" class="form-label fw-bold">Địa chỉ thường trú</label>
+                        <input asp-for="diachi" class="form-control"
+                               placeholder="Nhập địa chỉ (Xã/Phường, Quận/Huyện, Tỉnh/TP)..." />
+                        <span asp-validation-for="diachi" class="text-danger"></span>
+                    </div>
+
+                    <!-- BUTTONS -->
+                    <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                        <a asp-action="Index" class="btn btn-outline-secondary fw-semibold">
+                            <i class="bi bi-arrow-left me-1"></i> Quay lại
+                        </a>
+                        <button type="submit" class="btn btn-primary fw-semibold px-4 shadow-sm">
+                            <i class="bi bi-check-circle me-1"></i> Lưu Hồ Sơ
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

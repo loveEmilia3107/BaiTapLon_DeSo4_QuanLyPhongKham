@@ -1,0 +1,190 @@
+@using Microsoft.AspNetCore.Http
+@using static QuanLyPhongKham.Models.DangKyKham
+@model QuanLyPhongKham.Models.DangKyKham
+
+@{
+    ViewData["Title"] = "Chi Tiết Phiếu Đăng Ký Khám";
+
+    int? currentRole = Context.Session.GetInt32("Role");
+    bool isAdmin = currentRole.HasValue && currentRole.Value == 0;
+    bool isCanceled = Model.TrangThaiDK == TrangThaiDangKy.DaHuy;
+    bool isCompleted = Model.TrangThaiDK == TrangThaiDangKy.DaKham;
+}
+
+<div class="row justify-content-center my-4">
+    <div class="col-md-9 col-lg-8">
+        <div class="card shadow-sm border-0 rounded-3">
+            <!-- HEADER -->
+            <div class="card-header bg-primary text-white p-3 text-center">
+                <h4 class="mb-0 fw-bold">
+                    <i class="bi bi-file-earmark-medical me-2"></i>Chi Tiết Phiếu Đăng Ký Khám #@Model.maPhieu
+                </h4>
+            </div>
+
+            <!-- CARD BODY -->
+            <div class="card-body p-4">
+                <div class="row g-4">
+                    <!-- THÔNG TIN BỆNH NHÂN -->
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded-3 border h-100">
+                            <h6 class="fw-bold text-primary mb-3">
+                                <i class="bi bi-person-circle me-2"></i>Thông Tin Bệnh Nhân
+                            </h6>
+                            <p class="mb-2">
+                                <strong class="text-secondary">Họ và tên:</strong>
+                                <span class="fw-bold text-dark fs-6 d-block mt-1">
+                                    @(Model.bn01 != null ? Model.bn01.tenBN : "Chưa cập nhật")
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- THÔNG TIN LỊCH KHÁM & BÁC SĨ -->
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded-3 border h-100">
+                            <h6 class="fw-bold text-primary mb-3">
+                                <i class="bi bi-calendar-check me-2"></i>Thông Tin Ca Khám
+                            </h6>
+                            @if (Model.mLK != null)
+                            {
+                                <p class="mb-2">
+                                    <strong class="text-secondary">Bác sĩ phụ trách:</strong>
+                                    <span class="fw-bold text-dark d-block mt-1">
+                                        <i class="bi bi-person-badge text-primary me-1"></i>
+                                        BS. @(Model.mLK.bs != null ? Model.mLK.bs.tenBS : "Chưa phân công")
+                                    </span>
+                                </p>
+                                <p class="mb-1 text-muted small">
+                                    <i class="bi bi-calendar3 me-1"></i>Ca khám của bác sĩ:
+                                    <strong>@Model.mLK.ngayKham.ToString("dd/MM/yyyy")</strong>
+                                </p>
+                                <p class="mb-0 text-muted small">
+                                    <i class="bi bi-clock me-1"></i>Giờ khám:
+                                    <strong>@Model.mLK.gioBatdau.ToString(@"HH\:mm") -
+                                        @Model.mLK.gioKetthuc.ToString(@"HH\:mm")</strong>
+                                    </p>
+                                }
+                            else
+                                {
+                                    <span class="text-muted">Mã lịch khám: #@Model.mlk</span>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- THỜI GIAN ĐĂNG KÝ & TRẠNG THÁI -->
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded-3 border h-100">
+                                <strong class="text-secondary d-block mb-1">Thời Gian Đăng Ký:</strong>
+                                <span class="fw-semibold text-dark fs-6">
+                                    <i class="bi bi-alarm me-1 text-primary"></i>
+                                    @Model.ngayDK.ToString("dd/MM/yyyy")
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded-3 border h-100">
+                                <strong class="text-secondary d-block mb-2">Trạng Thái Hiện Tại:</strong>
+                                <div>
+                                    @switch (Model.TrangThaiDK)
+                                    {
+                                        case TrangThaiDangKy.ChoXacNhan:
+                                            <span class="badge bg-warning text-dark rounded-pill px-3 py-2 fs-6">
+                                                <i class="bi bi-clock-history me-1"></i>Chờ xác nhận
+                                            </span>
+                                            break;
+                                        case TrangThaiDangKy.DaXacNhan:
+                                            <span class="badge bg-info text-dark rounded-pill px-3 py-2 fs-6">
+                                                <i class="bi bi-check2-circle me-1"></i>Đã xác nhận
+                                            </span>
+                                            break;
+                                        case TrangThaiDangKy.DaKham:
+                                            <span class="badge bg-success rounded-pill px-3 py-2 fs-6">
+                                                <i class="bi bi-check-all me-1"></i>Đã khám xong
+                                            </span>
+                                            break;
+                                        case TrangThaiDangKy.DaHuy:
+                                            <span class="badge bg-secondary rounded-pill px-3 py-2 fs-6">
+                                                <i class="bi bi-x-circle me-1"></i>Đã hủy
+                                            </span>
+                                            break;
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- LÝ DO KHÁM -->
+                        <div class="col-12">
+                            <div class="p-3 bg-light rounded-3 border">
+                                <strong class="text-secondary d-block mb-1">Lý Do Khám / Triệu Chứng Ban Đầu:</strong>
+                                <p class="mb-0 text-dark fst-italic">
+                                    @(string.IsNullOrEmpty(Model.LiDo) ? "Không có mô tả chi tiết." : Model.LiDo)
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FOOTER BUTTONS -->
+                    <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+                        <a asp-action="Index" class="btn btn-outline-secondary fw-semibold">
+                            <i class="bi bi-arrow-left me-1"></i> Quay lại Danh sách
+                        </a>
+
+                        <div class="d-flex gap-2">
+                            <!-- NÚT EDIT (CHO ADMIN HOẶC BỆNH NHÂN KHI ĐƠN CHỜ XÁC NHẬN) -->
+                            @if (isAdmin || Model.TrangThaiDK == TrangThaiDangKy.ChoXacNhan)
+                            {
+                                <a asp-action="Edit" asp-route-id="@Model.maPhieu"
+                                   class="btn btn-primary fw-semibold px-4 shadow-sm">
+                                    <i class="bi bi-pencil-square me-1"></i> Chỉnh Sửa
+                                </a>
+                            }
+
+                            <!-- NÚT HỦY ĐƠN TRỰC TIẾP VIA MODAL -->
+                            @if (!isCanceled && !isCompleted)
+                            {
+                                <button type="button" class="btn btn-warning fw-semibold text-dark px-3" data-bs-toggle="modal"
+                                        data-bs-target="#cancelModalDetail">
+                                    <i class="bi bi-slash-circle me-1"></i> Hủy Đơn
+                                </button>
+
+                                <!-- MODAL XÁC NHẬN HỦY -->
+                                <div class="modal fade" id="cancelModalDetail" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered text-start">
+                                        <div class="modal-content border-0 shadow">
+                                            <div class="modal-header bg-warning text-dark">
+                                                <h5 class="modal-title fw-bold">
+                                                    <i class="bi bi-exclamation-triangle-fill me-2"></i>Xác Nhận Hủy Đăng Ký
+                                                </h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body p-4">
+                                                <p class="mb-1 text-dark fs-6">
+                                                    Bạn có chắc chắn muốn chuyển phiếu đăng ký mã <strong
+                                                    class="text-danger">#@Model.maPhieu</strong> sang trạng thái <strong>Đã
+                                                    Hủy</strong> không?
+                                                </p>
+                                            </div>
+                                            <div class="modal-footer bg-light p-3">
+                                                <button type="button" class="btn btn-secondary fw-semibold"
+                                                        data-bs-dismiss="modal">Không, giữ lại</button>
+
+                                                <form asp-action="HuyDon" asp-route-id="@Model.maPhieu" method="post"
+                                                      class="d-inline">
+                                                    @Html.AntiForgeryToken()
+                                                    <button type="submit" class="btn btn-warning fw-semibold px-4 text-dark">
+                                                        <i class="bi bi-x-circle me-1"></i> Đồng ý Hủy
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>

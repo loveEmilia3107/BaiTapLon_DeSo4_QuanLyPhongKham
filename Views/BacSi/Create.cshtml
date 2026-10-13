@@ -1,0 +1,137 @@
+@using static QuanLyPhongKham.Models.BacSi
+@model QuanLyPhongKham.Models.BacSi
+
+@{
+    ViewData["Title"] = "Thêm Bác sĩ Mới";
+}
+
+<div class="row justify-content-center my-4">
+    <div class="col-md-9 col-lg-8">
+        <div class="card shadow-sm border-0 rounded-3">
+            <!-- HEADER -->
+            <div class="card-header bg-primary text-white p-3 text-center">
+                <h4 class="mb-0 fw-bold">
+                    <i class="bi bi-person-plus-fill me-2"></i>Thêm Hồ Sơ Bác Sĩ Mới
+                </h4>
+            </div>
+
+            <!-- FORM BODY -->
+            <div class="card-body p-4">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                    <div class="row g-3">
+                        <!-- HỌ TÊN -->
+                        <div class="col-md-6">
+                            <label asp-for="tenBS" class="form-label fw-bold">Tên Bác sĩ <span
+                                class="text-danger">*</span></label>
+                                <input asp-for="tenBS" class="form-control" placeholder="Ví dụ: Nguyễn Văn A..." required />
+                                <span asp-validation-for="tenBS" class="text-danger"></span>
+                            </div>
+
+                            <!-- CHUYÊN KHOA (ĐÃ FIX: BIND VÀO ID MA/MCK CHỮ KHÔNG BIND VÀO OBJECT) -->
+                            <div class="col-md-6">
+                                <label asp-for="mck" class="form-label fw-bold">Chuyên khoa <span
+                                    class="text-danger">*</span></label>
+                                    <select asp-for="mck" class="form-select" asp-items="ViewBag.mck" required>
+                                        <option value="">-- Chọn chuyên khoa --</option>
+                                    </select>
+                                    <span asp-validation-for="mck" class="text-danger"></span>
+                                </div>
+
+                                <!-- NGÀY SINH (ĐÃ FIX: THÊM TYPE DATE) -->
+                                <div class="col-md-6">
+                                    <label asp-for="nsBS" class="form-label fw-bold">Ngày sinh <span
+                                        class="text-danger">*</span></label>
+                                        <input asp-for="nsBS" type="date" class="form-control" required />
+                                        <span asp-validation-for="nsBS" class="text-danger"></span>
+                                    </div>
+
+                                    <!-- GIỚI TÍNH -->
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold d-block">Giới tính</label>
+                                        <div class="form-check form-check-inline pt-1">
+                                            <input class="form-check-input" type="checkbox" asp-for="Gt" id="GtCheck" />
+                                            <label class="form-check-label fw-semibold" for="GtCheck">
+                                                Nam/Nữ? (Tích chọn nếu là Nam)
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- SỐ ĐIỆN THOẠI -->
+                                    <div class="col-md-6">
+                                        <label asp-for="sdtBS" class="form-label fw-bold">Số điện thoại <span
+                                            class="text-danger">*</span></label>
+                                            <input asp-for="sdtBS" type="tel" class="form-control" placeholder="Ví dụ: 0912345678"
+                                                   required />
+                                            <span asp-validation-for="sdtBS" class="text-danger"></span>
+                                        </div>
+
+                                        <!-- EMAIL -->
+                                        <div class="col-md-6">
+                                            <label asp-for="emailBS" class="form-label fw-bold">Email liên hệ <span
+                                                class="text-danger">*</span></label>
+                                                <input asp-for="emailBS" type="email" class="form-control" placeholder="doctor@clinic.com"
+                                                       required />
+                                                <span asp-validation-for="emailBS" class="text-danger"></span>
+                                            </div>
+
+                                            <!-- TRÌNH ĐỘ -->
+                                            <div class="col-md-4">
+                                                <label asp-for="TrD" class="form-label fw-bold">Trình độ / Học vị <span
+                                                    class="text-danger">*</span></label>
+                                                    <input asp-for="TrD" class="form-control" placeholder="Ví dụ: Thạc sĩ, Bác sĩ CKII..."
+                                                           required />
+                                                    <span asp-validation-for="TrD" class="text-danger"></span>
+                                                </div>
+
+                                                <!-- KINH NGHIỆM -->
+                                                <div class="col-md-4">
+                                                    <label asp-for="namKN" class="form-label fw-bold">Số năm kinh nghiệm <span
+                                                        class="text-danger">*</span></label>
+                                                        <input asp-for="namKN" type="number" min="0" class="form-control"
+                                                               placeholder="Số năm (VD: 5)" required />
+                                                        <span asp-validation-for="namKN" class="text-danger"></span>
+                                                    </div>
+
+                                                    <!-- GIÁ KHÁM -->
+                                                    <div class="col-md-4">
+                                                        <label asp-for="giaKham" class="form-label fw-bold">Giá khám (VNĐ) <span
+                                                            class="text-danger">*</span></label>
+                                                            <input asp-for="giaKham" type="number" step="1" min="0" class="form-control"
+                                                                   placeholder="VD: 200000" required />
+                                                            <span asp-validation-for="giaKham" class="text-danger"></span>
+                                                        </div>
+
+                                                        <!-- TRẠNG THÁI làm việc -->
+                                                        <div class="col-12">
+                                                            <label asp-for="TrangThaiBS" class="form-label fw-bold">Trạng thái công tác <span
+                                                                class="text-danger">*</span></label>
+                                                                <select asp-for="TrangThaiBS" class="form-select"
+                                                                        asp-items="Html.GetEnumSelectList<TrangThaiBacSi>()" required>
+                                                                    <option value="">-- Chọn trạng thái --</option>
+                                                                </select>
+                                                                <span asp-validation-for="TrangThaiBS" class="text-danger"></span>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- BUTTONS -->
+                                                        <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+                                                            <a asp-action="Index" class="btn btn-outline-secondary fw-semibold">
+                                                                <i class="bi bi-arrow-left me-1"></i> Quay lại
+                                                            </a>
+                                                            <button type="submit" class="btn btn-primary fw-semibold px-4 shadow-sm">
+                                                                <i class="bi bi-check-circle me-1"></i> Lưu Bác Sĩ
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    @section Scripts {
+                                        @{
+                                            await Html.RenderPartialAsync("_ValidationScriptsPartial");
+                                        }
+                                    }

@@ -1,0 +1,195 @@
+@using Microsoft.AspNetCore.Http
+@using static QuanLyPhongKham.Models.ChuyenKhoa
+@model IEnumerable<QuanLyPhongKham.Models.ChuyenKhoa>
+
+@{
+    ViewData["Title"] = "Danh sách Chuyên khoa";
+
+    int? currentRole = Context.Session.GetInt32("Role");
+    bool isAdmin = currentRole.HasValue && currentRole.Value == 0;
+}
+
+<!-- HEADER TRANG -->
+<div class="card shadow-sm border-0 mb-4 rounded-3">
+    <div class="card-body p-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div>
+                <h3 class="fw-bold text-primary mb-1">
+                    <i class="bi bi-hospital me-2"></i>Chuyên Khoa Khám Bệnh
+                </h3>
+                <p class="text-muted mb-0">Danh sách các chuyên khoa y tế và dịch vụ tư vấn khám chữa bệnh</p>
+            </div>
+            @if (isAdmin)
+            {
+                <div>
+                    <a asp-action="Create" class="btn btn-success fw-semibold shadow-sm">
+                        <i class="bi bi-plus-lg me-1"></i> Thêm Chuyên Khoa Mới
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show my-3 shadow-sm border-0" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i> @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show my-3 shadow-sm border-0" role="alert">
+        <i class="bi bi-check-circle-fill me-2 fs-5"></i> @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (Model != null && Model.Any())
+{
+    <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-primary text-white">
+                    <tr>
+                        <th class="py-3 px-4">Tên Chuyên Khoa</th>
+                        <th class="py-3 px-3" style="min-width: 300px;">Mô tả</th>
+                        <th class="py-3 px-3 text-center">Trạng thái</th>
+                        <th class="py-3 px-4 text-end" style="min-width: 240px;">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <!-- TÊN CHUYÊN KHOA -->
+                            <td class="px-4">
+                                <div class="d-flex align-items-center">
+                                    <div
+                                        class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 me-3 d-none d-sm-block">
+                                        <i class="bi bi-diagram-3 fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold text-dark fs-6">@item.tenCK</div>
+                                        <small class="text-muted">Mã CK: #@item.maCK</small>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- MÔ TẢ -->
+                            <td class="px-3 text-secondary">
+                                @(string.IsNullOrEmpty(item.motaCK) ? "Chưa có mô tả..." : (item.motaCK.Length > 100 ?
+                        item.motaCK.Substring(0, 100) + "..." : item.motaCK))
+                            </td>
+
+                            <!-- TRẠNG THÁI -->
+                            <td class="px-3 text-center">
+                                @if (item.TrangThaiCK == TrangThaiChuyenKhoa.DangHoatDong)
+                                {
+                                    <span class="badge bg-success rounded-pill px-3 py-2">
+                                        <i class="bi bi-check-circle me-1"></i>Hoạt động
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary rounded-pill px-3 py-2">
+                                        <i class="bi bi-pause-circle me-1"></i>Tạm dừng
+                                    </span>
+                                }
+                            </td>
+
+                            <!-- THAO TÁC -->
+                            <td class="px-4 text-end">
+                                <div class="d-inline-flex gap-1 align-items-center">
+                                    <a asp-controller="BacSi" asp-action="Index" asp-route-SearchType="ck"
+                                       asp-route-MaCK="@item.maCK" class="btn btn-sm btn-outline-success fw-semibold shadow-sm"
+                                       title="Xem danh sách bác sĩ chuyên khoa này">
+                                        <i class="bi bi-person-badge me-1"></i> Bác sĩ
+                                    </a>
+
+                                    <a asp-action="Details" asp-route-id="@item.maCK" class="btn btn-sm btn-outline-info"
+                                       title="Xem chi tiết">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+
+                                    @if (isAdmin)
+                                    {
+                                        <a asp-action="Edit" asp-route-id="@item.maCK" class="btn btn-sm btn-outline-primary"
+                                           title="Chỉnh sửa">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+
+                                        <!-- 🛑 NÚT BẤM KÍCH HOẠT MODAL XÓA TRỰC TIẾP -->
+                                        <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal"
+                                                data-bs-target="#deleteModal-@item.maCK" title="Xóa chuyên khoa">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+
+                                        <!-- 🛑 MODAL XÁC NHẬN XÓA TẠI CHỖ KÈM CẢNH BÁO CASCADE WIPE -->
+                                        <div class="modal fade" id="deleteModal-@item.maCK" tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered text-start">
+                                                <div class="modal-content border-0 shadow">
+                                                    <div class="modal-header bg-danger text-white">
+                                                        <h5 class="modal-title fw-bold">
+                                                            <i class="bi bi-exclamation-triangle-fill me-2"></i>Xác Nhận Xóa Chuyên
+                                                            Khoa
+                                                        </h5>
+                                                        <button type="button" class="btn-close btn-close-white"
+                                                                data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body p-4">
+                                                        <p class="mb-2 text-dark fs-6">
+                                                            Bạn có chắc chắn muốn xóa vĩnh viễn chuyên khoa <strong
+                                                            class="text-danger">@item.tenCK</strong> khỏi hệ thống không?
+                                                        </p>
+                                                        <div class="alert alert-warning mb-0 p-3 small rounded-3">
+                                                            <i class="bi bi-info-circle-fill me-1"></i>
+                                                            <strong>Cảnh báo Cascade Wipe:</strong> Việc xóa chuyên khoa này sẽ đồng
+                                                            thời dọn dẹp sạch toàn bộ Bác sĩ, Lịch khám và các Phiếu Đăng Ký Khám
+                                                            bắc cầu thuộc chuyên khoa này!
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer bg-light p-3">
+                                                        <button type="button" class="btn btn-outline-secondary fw-semibold"
+                                                                data-bs-dismiss="modal">
+                                                            <i class="bi bi-x-circle me-1"></i> Hủy bỏ
+                                                        </button>
+                                                        <form asp-action="Delete" asp-route-id="@item.maCK" method="post"
+                                                              class="d-inline">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" class="btn btn-danger fw-bold shadow-sm px-4">
+                                                                <i class="bi bi-trash-fill me-1"></i> Đồng Ý Xóa
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+else
+{
+    <div class="card shadow-sm border-0 rounded-3 text-center p-5">
+        <div class="card-body">
+            <i class="bi bi-hospital text-muted display-1 mb-3"></i>
+            <h4 class="fw-bold text-dark mb-2">Chưa có chuyên khoa nào!</h4>
+            <p class="text-muted">Hệ thống hiện tại chưa có dữ liệu chuyên khoa khám bệnh.</p>
+            @if (isAdmin)
+            {
+                <a asp-action="Create" class="btn btn-primary mt-2 fw-semibold">
+                    <i class="bi bi-plus-lg me-1"></i> Thêm Chuyên Khoa Mới
+                </a>
+            }
+        </div>
+    </div>
+}
