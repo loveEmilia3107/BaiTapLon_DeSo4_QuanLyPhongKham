@@ -12,7 +12,7 @@ namespace QuanLyPhongKham.Controllers
             var controllerName = context.RouteData.Values["controller"]?.ToString();
             var actionName = context.RouteData.Values["action"]?.ToString();
 
-            // 🛑 BẪY CHẶN ĐỆ QUY: Bỏ qua kiểm tra Session nếu đang ở trang Login hoặc Register
+            // stackoverflow block
             if (string.Equals(controllerName, "TaiKhoan", StringComparison.OrdinalIgnoreCase) &&
                (string.Equals(actionName, "Login", StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(actionName, "Register", StringComparison.OrdinalIgnoreCase)))
@@ -26,7 +26,7 @@ namespace QuanLyPhongKham.Controllers
             if (accId == null)
             {
                 context.Result = new RedirectToActionResult("Login", "TaiKhoan", null);
-                return; // Ngắt luồng thực thi ngay tại đây
+                return;
             }
 
             base.OnActionExecuting(context);
@@ -34,10 +34,10 @@ namespace QuanLyPhongKham.Controllers
 
         protected int CurrentAccId => HttpContext.Session.GetInt32("AccID") ?? 0;
 
-        // 1 = Bệnh nhân, 0 = Admin
+        // BenhNhan = 1, Admin = 0
         protected int CurrentRole => HttpContext.Session.GetInt32("Role") ?? 1;
 
-        // 🛑 Bẫy kiểm tra Admin (role == 0)
+        // if isAdmin, role = 0
         protected bool IsAdmin => CurrentRole == 0;
     }
 }
