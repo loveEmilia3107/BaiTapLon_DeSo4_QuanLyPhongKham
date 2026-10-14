@@ -37,7 +37,7 @@ namespace QuanLyPhongKham.Controllers
             return View(dsBenhNhan);
         }
 
-        // GET: BenhNhan/Details/5
+        // GET: BenhNhan/Details
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
@@ -48,7 +48,7 @@ namespace QuanLyPhongKham.Controllers
 
             if (benhNhan == null) return NotFound();
 
-            // 🛑 BẪY PHÂN QUYỀN
+            // Phan quyen
             if (!IsAdmin && benhNhan.mtk != CurrentAccId)
             {
                 TempData["ErrorMessage"] = "Bạn không có quyền xem hồ sơ bệnh nhân này!";
@@ -73,7 +73,7 @@ namespace QuanLyPhongKham.Controllers
                 ViewBag.DefaultEmail = currentAcc.email;
             }
 
-            // 🛑 NẾU LÀ ADMIN -> ĐỔ DANH SÁCH TÀI KHOẢN ĐỂ TÙY CHỌN TÀI KHOẢN SỞ HỮU
+            // Kiem tra admin
             if (IsAdmin)
             {
                 ViewData["mtk"] = new SelectList(_context.TaiKhoan.Select(t => new
@@ -96,7 +96,7 @@ namespace QuanLyPhongKham.Controllers
                 return RedirectToAction("Login", "TaiKhoan");
             }
 
-            // 🛑 NẾU KHÔNG PHẢI ADMIN -> BẮT BUỘC ÉP mtk LÀ CHÍNH TÀI KHOẢN ĐANG ĐĂNG NHẬP
+            //  NẾU KHÔNG PHẢI ADMIN -> BẮT BUỘC ÉP mtk LÀ CHÍNH TÀI KHOẢN ĐANG ĐĂNG NHẬP
             if (!IsAdmin || benhNhan.mtk <= 0)
             {
                 benhNhan.mtk = CurrentAccId;
@@ -132,7 +132,7 @@ namespace QuanLyPhongKham.Controllers
             return View(benhNhan);
         }
 
-        // GET: BenhNhan/Edit/5
+        // GET: BenhNhan/Edit
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -140,7 +140,6 @@ namespace QuanLyPhongKham.Controllers
             var benhNhan = await _context.BenhNhan.FindAsync(id);
             if (benhNhan == null) return NotFound();
 
-            // 🛑 BẪY PHÂN QUYỀN EDIT
             if (!IsAdmin && benhNhan.mtk != CurrentAccId)
             {
                 TempData["ErrorMessage"] = "Bạn không có quyền chỉnh sửa hồ sơ bệnh nhân này!";
@@ -156,7 +155,7 @@ namespace QuanLyPhongKham.Controllers
             return View(benhNhan);
         }
 
-        // POST: BenhNhan/Edit/5
+        // POST: BenhNhan/Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("maBN,mtk,tenBN,nsBN,sdtBN,email,diachi")] BenhNhan benhNhan)
@@ -166,14 +165,12 @@ namespace QuanLyPhongKham.Controllers
             var oldBN = await _context.BenhNhan.AsNoTracking().FirstOrDefaultAsync(b => b.maBN == id);
             if (oldBN == null) return NotFound();
 
-            // 🛑 BẢO VỆ PHÂN QUYỀN
             if (!IsAdmin && oldBN.mtk != CurrentAccId)
             {
                 TempData["ErrorMessage"] = "Bạn không có quyền chỉnh sửa hồ sơ bệnh nhân này!";
                 return RedirectToAction(nameof(Index));
             }
 
-            // Bệnh nhân thường không được tự đổi mtk
             if (!IsAdmin)
             {
                 benhNhan.mtk = oldBN.mtk;
@@ -206,7 +203,7 @@ namespace QuanLyPhongKham.Controllers
             return View(benhNhan);
         }
 
-        // POST: BenhNhan/Delete/5
+        // POST: BenhNhan/Delete
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
